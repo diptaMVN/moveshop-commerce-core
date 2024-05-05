@@ -5,7 +5,15 @@ export class AdminBuilder1714763786624 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE "admin_builder" ("id" character varying NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "property_id" character varying, "type" character varying  NOT NULL,  "store_id" character varying, "value" character varying, CONSTRAINT "PK_8c95c4fd1c4b0be92d6fda50ac5" PRIMARY KEY ("id"))`
+      `CREATE TABLE "admin_builder" (
+        "id" character varying NOT NULL,
+         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+          "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+           "property_id" character varying,
+            "type" character varying  NOT NULL,
+              "store_id" character varying,
+               "value" character varying(10000),
+                CONSTRAINT "PK_8c95c4fd1c4b0be92d6fda50ac5" PRIMARY KEY ("id"))`
     )
 
     await queryRunner.query(

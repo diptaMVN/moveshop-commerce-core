@@ -41,7 +41,7 @@ import taxRateRoutes from "./tax-rates"
 import uploadRoutes from "./uploads"
 import userRoutes, { unauthenticatedUserRoutes } from "./users"
 import variantRoutes from "./variants"
-
+import adminBuilderRoute from "./admin-builder"
 const route = Router()
 
 export default (app, container, config) => {
@@ -115,6 +115,6 @@ export default (app, container, config) => {
   paymentCollectionRoutes(route)
   paymentRoutes(route)
   productCategoryRoutes(route)
-
+  adminBuilderRoute(route)
   return app
 }
