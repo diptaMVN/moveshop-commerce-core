@@ -1,3 +1,4 @@
+import { AdminBuilderRepository } from "./../repositories/admin-builder"
 import { EntityManager } from "typeorm"
 import { AdminBuilder } from "../models/admin-builder"
 import { TransactionBaseService } from "../interfaces"
@@ -5,17 +6,20 @@ import { buildQuery } from "../utils"
 import { IAdminBuildersCreate } from "../interfaces/admin-builder"
 type InjectedDependencies = {
   manager: EntityManager
-  adminBuilderRepository: typeof AdminBuilder
+  adminBuilderRepository: typeof AdminBuilderRepository
 }
 
 class AdminBuilderService extends TransactionBaseService {
-  constructor(container: InjectedDependencies) {
-    super(container)
+  protected readonly adminRepository_: typeof AdminBuilderRepository
+  constructor({ adminBuilderRepository }: InjectedDependencies) {
+    super(arguments[0])
+    this.adminRepository_ = adminBuilderRepository
   }
 
   async create(createData: IAdminBuildersCreate) {
-    const adminBuilderRepository =
-      this.activeManager_.getRepository(AdminBuilder)
+    const adminBuilderRepository = this.activeManager_.withRepository(
+      this.adminRepository_
+    )
     try {
       // Exist
       const exist = await this.update(createData, createData.property_id)
@@ -36,14 +40,16 @@ class AdminBuilderService extends TransactionBaseService {
     }
   }
   async update(createData: IAdminBuildersCreate, property_id: string) {
-    const adminBuilderRepository =
-      this.activeManager_.getRepository(AdminBuilder)
+    const adminBuilderRepository = this.activeManager_.withRepository(
+      this.adminRepository_
+    )
     try {
       const exist = await this.getByPropertyId(property_id)
       if (exist) {
         exist.property_id = createData.property_id
         exist.type = createData.type
         exist.value = createData.value
+
         const result = await adminBuilderRepository.save(exist)
         return result
       } else {
@@ -55,8 +61,9 @@ class AdminBuilderService extends TransactionBaseService {
     }
   }
   async get() {
-    const adminBuilderRepository =
-      this.activeManager_.getRepository(AdminBuilder)
+    const adminBuilderRepository = this.activeManager_.withRepository(
+      this.adminRepository_
+    )
     try {
       const result = await adminBuilderRepository.find()
 
@@ -66,10 +73,12 @@ class AdminBuilderService extends TransactionBaseService {
     }
   }
   async getByPropertyId(id: string) {
-    const adminBuilderRepository =
-      this.activeManager_.getRepository(AdminBuilder)
+    const adminBuilderRepository = this.activeManager_.withRepository(
+      this.adminRepository_
+    )
     try {
       const query = buildQuery({ property_id: id })
+      console.log(adminBuilderRepository)
       const result = await adminBuilderRepository.findOne(query)
 
       return result

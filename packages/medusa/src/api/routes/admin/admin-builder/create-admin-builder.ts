@@ -1,3 +1,4 @@
+import { EntityManager } from "typeorm"
 import { IsBoolean, IsNumber, IsString } from "class-validator"
 
 import { validator } from "../../../../utils/validator"
@@ -33,15 +34,22 @@ export default async (req, res) => {
     })
   }
 
-  const AdminBuilder: AdminBuilderService = req.scope.resolve(
+  const adminBuilderService: AdminBuilderService = req.scope.resolve(
     "adminBuilderService"
   )
 
+  const manager: EntityManager = req.scope.resolve("manager")
+
   try {
-    const result = await AdminBuilder.create(validated)
+    const builder = await manager.transaction(async (transactionManager) => {
+      return await adminBuilderService
+        .withTransaction(transactionManager)
+        .create(validated)
+    })
+
     res.status(201).json({
       success: true,
-      data: result,
+      data: builder,
       message: "Data is successfully created",
     })
   } catch (error) {
@@ -51,6 +59,21 @@ export default async (req, res) => {
       error: error,
     })
   }
+
+  // try {
+  //   const result = await AdminBuilder.create(validated)
+  //   res.status(201).json({
+  //     success: true,
+  //     data: result,
+  //     message: "Data is successfully created",
+  //   })
+  // } catch (error) {
+  //   res.status(406).json({
+  //     success: false,
+  //     message: "Failed to create",
+  //     error: error,
+  //   })
+  // }
 }
 // Boolean
 export class AdminBuilderBooleanPostReq {
