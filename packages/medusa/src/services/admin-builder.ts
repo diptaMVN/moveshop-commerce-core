@@ -4,16 +4,23 @@ import { AdminBuilder } from "../models/admin-builder"
 import { TransactionBaseService } from "../interfaces"
 import { buildQuery } from "../utils"
 import { IAdminBuildersCreate } from "../interfaces/admin-builder"
+import EventBusService from "./event-bus"
 type InjectedDependencies = {
   manager: EntityManager
   adminBuilderRepository: typeof AdminBuilderRepository
+  eventBusService: EventBusService
 }
 
 class AdminBuilderService extends TransactionBaseService {
   protected readonly adminRepository_: typeof AdminBuilderRepository
-  constructor({ adminBuilderRepository }: InjectedDependencies) {
+  protected readonly eventBusService_: EventBusService
+  constructor({
+    adminBuilderRepository,
+    eventBusService,
+  }: InjectedDependencies) {
     super(arguments[0])
     this.adminRepository_ = adminBuilderRepository
+    this.eventBusService_ = eventBusService
   }
 
   async create(createData: IAdminBuildersCreate) {
