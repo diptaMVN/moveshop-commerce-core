@@ -12,8 +12,11 @@ const eventBusServiceMock = {
 } as unknown as EventBusService
 
 const adminBuilderRepositoryMock = MockRepository({
+  create: jest.fn().mockImplementation((data) => {
+    return data
+  }),
   save: jest.fn().mockImplementation((data) => {
-    return Object.assign(new AdminBuilder(), data)
+    return Promise.resolve({ ...data })
   }),
 })
 
@@ -24,9 +27,9 @@ describe("AdminBuilderService", () => {
     eventBusService: eventBusServiceMock,
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
+  // afterEach(() => {
+  //   jest.clearAllMocks()
+  // })
   const createData: IAdminBuildersCreate = {
     property_id: "theme_name",
     value: "Apple Theme 4",
@@ -36,11 +39,12 @@ describe("AdminBuilderService", () => {
   describe("create", () => {
     it("should create a new admin builder", async () => {
       // Mocking behavior of the repository's save method
-      await adminBuilderService.create(createData)
-      // console.log(createData)
+      const result = await adminBuilderService.create(createData)
+      console.log(result, "New return")
       // Assertions
       expect(adminBuilderRepositoryMock.save).toHaveBeenCalledTimes(1) // Ensure save method of repository is called once
       expect(adminBuilderRepositoryMock.create).toHaveBeenCalledWith(createData)
+      expect(result).toEqual(createData)
     })
   })
 })
