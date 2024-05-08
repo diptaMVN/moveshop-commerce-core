@@ -82,13 +82,14 @@ class AdminBuilderService extends TransactionBaseService {
       throw error
     }
   }
+
   async getByPropertyId(id: string) {
     const adminBuilderRepository = this.activeManager_.withRepository(
       this.adminRepository_
     )
     try {
       const query = buildQuery({ property_id: id })
-      console.log(adminBuilderRepository)
+      // console.log(adminBuilderRepository)
       const result = await adminBuilderRepository.findOne(query)
 
       return result
