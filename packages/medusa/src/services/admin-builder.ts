@@ -21,7 +21,6 @@ class AdminBuilderService extends TransactionBaseService {
     super(arguments[0])
     this.adminRepository_ = adminBuilderRepository
     this.eventBusService_ = eventBusService
-    console.log(adminBuilderRepository + ": " + eventBusService)
   }
 
   async create(createData: IAdminBuildersCreate) {
@@ -40,9 +39,7 @@ class AdminBuilderService extends TransactionBaseService {
         return result
       } else {
         const data = adminBuilderRepository.create(createData)
-        console.log(data, " = Service 42")
         const result = await adminBuilderRepository.save(data)
-        console.log(result, " = Service 44")
         return result
       }
     } catch (error: any) {

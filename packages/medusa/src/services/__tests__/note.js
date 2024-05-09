@@ -92,6 +92,7 @@ describe("NoteService", () => {
     const note = {
       id: IdMap.getId("note"),
       author_id: IdMap.getId("user"),
+      store_id: "1",
     }
 
     const noteRepo = MockRepository({
@@ -115,6 +116,7 @@ describe("NoteService", () => {
         resource_type: "type",
         value: "my note",
         author_id: IdMap.getId("user"),
+        store_id: "1",
       })
 
       expect(noteRepo.create).toHaveBeenCalledTimes(1)
@@ -124,12 +126,14 @@ describe("NoteService", () => {
         value: "my note",
         author_id: IdMap.getId("user"),
         metadata: {},
+        store_id: "1",
       })
 
       expect(noteRepo.save).toHaveBeenCalledTimes(1)
       expect(noteRepo.save).toHaveBeenCalledWith({
         id: IdMap.getId("note"),
         author_id: IdMap.getId("user"),
+        store_id: "1",
       })
 
       expect(EventBusServiceMock.emit).toHaveBeenCalledTimes(1)
@@ -141,7 +145,7 @@ describe("NoteService", () => {
   })
 
   describe("update", () => {
-    const note = { id: IdMap.getId("note") }
+    const note = { id: IdMap.getId("note"), store_id: "1" }
 
     const noteRepo = MockRepository({
       findOne: (f) => Promise.resolve(note),
@@ -159,7 +163,7 @@ describe("NoteService", () => {
     })
 
     it("calls note model functions", async () => {
-      await noteService.update(IdMap.getId("note"), "new note")
+      await noteService.update("1", IdMap.getId("note"), "new note")
 
       expect(noteRepo.save).toHaveBeenCalledTimes(1)
       expect(noteRepo.save).toHaveBeenCalledWith({
@@ -194,7 +198,7 @@ describe("NoteService", () => {
     })
 
     it("calls note model functions", async () => {
-      await noteService.delete(IdMap.getId("note"))
+      await noteService.delete("1", IdMap.getId("note"))
 
       expect(noteRepo.softRemove).toHaveBeenCalledTimes(1)
       expect(noteRepo.softRemove).toHaveBeenCalledWith(note)

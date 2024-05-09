@@ -19,9 +19,11 @@ describe("AuthService", () => {
 
     it("returns success and user when passwords match", async () => {
       const result = await authService.authenticate(
+        "1",
         "oliver@test.dk",
         "123456789"
       )
+      console.log(result)
 
       expect(result.success).toEqual(true)
       expect(result.user.email).toEqual("oliver@test.dk")
@@ -44,18 +46,20 @@ describe("AuthService", () => {
       jest.clearAllMocks()
     })
 
-    it("returns success and user when passwords match", async () => {
+    it("returns success and customer when passwords match", async () => {
       const result = await authService.authenticateCustomer(
+        "1",
         "oliver@test.dk",
         "123456789"
       )
 
-      expect(result.success).toEqual(true)
-      expect(result.customer.email).toEqual("oliver@test.dk")
+      expect(result.success).toBe(true)
+      expect(result.customer.email).toBe("oliver@test.dk")
     })
 
     it("returns failure when passwords don't match", async () => {
       const result = await authService.authenticateCustomer(
+        "1",
         "oliver@test.dk",
         "invalid-password"
       )
