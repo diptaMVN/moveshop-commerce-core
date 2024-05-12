@@ -36,11 +36,10 @@ describe("NoteService", () => {
           relations: ["author"],
         }
       )
+
       expect(noteRepo.findAndCount).toHaveBeenCalledTimes(1)
       expect(noteRepo.findAndCount).toHaveBeenCalledWith({
-        where: {
-          resource_id: IdMap.getId("note"),
-        },
+        where: { store_id: "1" },
         relations: { author: true },
       })
     })
