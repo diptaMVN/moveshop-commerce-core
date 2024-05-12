@@ -69,7 +69,7 @@ describe(`PaymentProviderService`, () => {
   })
 
   it("successfully creates session", async () => {
-    await providerService.createSession("default_provider", {
+    await providerService.createSession("1", "default_provider", {
       object: "cart",
       region: {
         currency_code: "usd",
@@ -98,6 +98,7 @@ describe(`PaymentProviderService`, () => {
 
   it("successfully update session", async () => {
     await providerService.updateSession(
+      "1",
       {
         id: "session",
         provider_id: "default_provider",
@@ -131,6 +132,7 @@ describe(`PaymentProviderService`, () => {
 
   it("successfully refresh session", async () => {
     await providerService.refreshSession(
+      "1",
       {
         id: "session",
         provider_id: "default_provider",
@@ -153,7 +155,7 @@ describe(`PaymentProviderService`, () => {
   })
 
   it("successfully delete session", async () => {
-    await providerService.deleteSession({
+    await providerService.deleteSession("1", {
       id: "session",
       provider_id: "default_provider",
       data: {
@@ -165,7 +167,7 @@ describe(`PaymentProviderService`, () => {
   })
 
   it("successfully delete session", async () => {
-    await providerService.deleteSession({
+    await providerService.deleteSession("1", {
       id: "session",
       provider_id: "default_provider",
       data: {
@@ -178,6 +180,7 @@ describe(`PaymentProviderService`, () => {
 
   it("successfully authorize payment", async () => {
     await providerService.authorizePayment(
+      "1",
       {
         id: "session",
         provider_id: "default_provider",
@@ -193,6 +196,7 @@ describe(`PaymentProviderService`, () => {
 
   it("successfully update session data", async () => {
     await providerService.updateSessionData(
+      "1",
       {
         id: "session",
         provider_id: "default_provider",
@@ -254,7 +258,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
     const providerService = container.resolve(paymentServiceResolutionKey)
 
     it("successfully creates session", async () => {
-      await providerService.createSession(defaultPaymentSessionInputData)
+      await providerService.createSession("1", defaultPaymentSessionInputData)
 
       const provider = container.resolve(paymentProcessorResolutionKey)
 
@@ -291,7 +295,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
       const providerService = container.resolve(paymentServiceResolutionKey)
 
       const err = await providerService
-        .createSession(defaultPaymentSessionInputData)
+        .createSession("1", defaultPaymentSessionInputData)
         .catch((e) => e)
 
       expect(err.message).toBe(
@@ -332,6 +336,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
 
     it("successfully refresh a session", async () => {
       await providerService.refreshSession(
+        "1",
         {
           id: sessionId,
           data: paymentSessionData,
@@ -379,6 +384,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
 
       const err = await providerService
         .refreshSession(
+          "1",
           {
             id: sessionId,
             data: paymentSessionData,
@@ -423,6 +429,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
 
     it("successfully update a session", async () => {
       await providerService.updateSession(
+        "1",
         {
           id: sessionId,
           data: paymentSessionData,
@@ -467,6 +474,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
 
       const err = await providerService
         .updateSession(
+          "1",
           {
             id: sessionId,
             data: paymentSessionData,
@@ -508,7 +516,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
     const providerService = container.resolve(paymentServiceResolutionKey)
 
     it("successfully delete a session", async () => {
-      await providerService.deleteSession({
+      await providerService.deleteSession("1", {
         id: sessionId,
         data: paymentSessionData,
         provider_id: paymentProviderId,
@@ -540,7 +548,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
       const providerService = container.resolve(paymentServiceResolutionKey)
 
       const err = await providerService
-        .deleteSession({
+        .deleteSession("1", {
           id: sessionId,
           data: paymentSessionData,
           provider_id: paymentProviderId,
@@ -651,7 +659,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
     const providerService = container.resolve(paymentServiceResolutionKey)
 
     it("successfully authorize a payment", async () => {
-      await providerService.authorizePayment(paymentSession, context)
+      await providerService.authorizePayment("1", paymentSession, context)
 
       const provider = container.resolve(paymentProcessorResolutionKey)
 
@@ -682,7 +690,7 @@ describe("PaymentProviderService using AbstractPaymentProcessor", () => {
       const providerService = container.resolve(paymentServiceResolutionKey)
 
       const err = await providerService
-        .authorizePayment(paymentSession, context)
+        .authorizePayment("1", paymentSession, context)
         .catch((e) => e)
 
       expect(err.message).toBe(

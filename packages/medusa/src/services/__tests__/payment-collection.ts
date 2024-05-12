@@ -2,20 +2,20 @@ import { IdMap, MockManager, MockRepository } from "medusa-test-utils"
 import {
   PaymentCollection,
   PaymentCollectionStatus,
-  PaymentCollectionType
+  PaymentCollectionType,
 } from "../../models"
 import { PaymentCollectionsSessionsBatchInput } from "../../types/payment-collection"
 import EventBusService from "../event-bus"
 import {
   CustomerService,
   PaymentCollectionService,
-  PaymentProviderService
+  PaymentProviderService,
 } from "../index"
 import { CustomerServiceMock } from "../__mocks__/customer"
 import { EventBusServiceMock } from "../__mocks__/event-bus"
 import {
   DefaultProviderMock,
-  PaymentProviderServiceMock
+  PaymentProviderServiceMock,
 } from "../__mocks__/payment-provider"
 
 describe("PaymentCollectionService", () => {
@@ -389,6 +389,7 @@ describe("PaymentCollectionService", () => {
 
     it("should throw error if payment collection doesn't have the correct status", async () => {
       const ret = paymentCollectionService.setPaymentSession(
+        "1",
         IdMap.getId("payment-collection-id2"),
         {
           provider_id: IdMap.getId("region1_provider1"),
@@ -406,6 +407,7 @@ describe("PaymentCollectionService", () => {
 
     it("should ignore session if provider doesn't belong to the region", async () => {
       const multiRet = paymentCollectionService.setPaymentSession(
+        "1",
         IdMap.getId("payment-collection-id1"),
         {
           provider_id: IdMap.getId("region1_invalid_provider"),
@@ -419,6 +421,7 @@ describe("PaymentCollectionService", () => {
 
     it("should add a new session", async () => {
       await paymentCollectionService.setPaymentSession(
+        "1",
         IdMap.getId("payment-collection-id1"),
         {
           provider_id: IdMap.getId("region1_provider2"),
@@ -433,6 +436,7 @@ describe("PaymentCollectionService", () => {
 
     it("should update an existing one", async () => {
       await paymentCollectionService.setPaymentSession(
+        "1",
         IdMap.getId("payment-collection-id1"),
         {
           provider_id: IdMap.getId("region1_provider1"),
@@ -454,6 +458,7 @@ describe("PaymentCollectionService", () => {
         },
       ]
       await paymentCollectionService.setPaymentSessionsBatch(
+        "1",
         IdMap.getId("payment-collection-session"),
         inp,
         IdMap.getId("lebron")
@@ -480,6 +485,7 @@ describe("PaymentCollectionService", () => {
         },
       ]
       const ret = paymentCollectionService.setPaymentSessionsBatch(
+        "1",
         IdMap.getId("payment-collection-id2"),
         inp,
         "customer1"
@@ -503,6 +509,7 @@ describe("PaymentCollectionService", () => {
       ]
 
       const ret = paymentCollectionService.setPaymentSessionsBatch(
+        "1",
         IdMap.getId("payment-collection-id1"),
         inp,
         "customer1"
@@ -524,6 +531,7 @@ describe("PaymentCollectionService", () => {
         },
       ]
       const multiRet = paymentCollectionService.setPaymentSessionsBatch(
+        "1",
         IdMap.getId("payment-collection-id1"),
         multInp,
         "customer1"
@@ -547,6 +555,7 @@ describe("PaymentCollectionService", () => {
         },
       ]
       const multiRet = paymentCollectionService.setPaymentSessionsBatch(
+        "1",
         IdMap.getId("payment-collection-id1"),
         multInp,
         "customer1"
@@ -571,6 +580,7 @@ describe("PaymentCollectionService", () => {
         },
       ]
       await paymentCollectionService.setPaymentSessionsBatch(
+        "1",
         IdMap.getId("payment-collection-session"),
         inp,
         "lebron"
@@ -590,6 +600,7 @@ describe("PaymentCollectionService", () => {
         },
       ]
       await paymentCollectionService.setPaymentSessionsBatch(
+        "1",
         IdMap.getId("payment-collection-session"),
         inp,
         IdMap.getId("lebron")
@@ -604,6 +615,7 @@ describe("PaymentCollectionService", () => {
 
     it("should refresh a payment session", async () => {
       await paymentCollectionService.refreshPaymentSession(
+        "1",
         IdMap.getId("payment-collection-session"),
         IdMap.getId("payCol_session1"),
         "customer1"
@@ -616,6 +628,7 @@ describe("PaymentCollectionService", () => {
 
     it("should throw to refresh a payment session that doesn't exist", async () => {
       const sess = paymentCollectionService.refreshPaymentSession(
+        "1",
         IdMap.getId("payment-collection-session"),
         IdMap.getId("payCol_session-not-found"),
         "customer1"
@@ -639,6 +652,7 @@ describe("PaymentCollectionService", () => {
 
     it("should mark as authorized if amount is 0", async () => {
       const auth = await paymentCollectionService.authorizePaymentSessions(
+        "1",
         IdMap.getId("payment-collection-zero"),
         []
       )
@@ -651,6 +665,7 @@ describe("PaymentCollectionService", () => {
 
     it("should reject payment collection without payment sessions", async () => {
       const ret = paymentCollectionService.authorizePaymentSessions(
+        "1",
         IdMap.getId("payment-collection-no-session"),
         []
       )
@@ -664,6 +679,7 @@ describe("PaymentCollectionService", () => {
 
     it("should call authorizePayments for all sessions", async () => {
       await paymentCollectionService.authorizePaymentSessions(
+        "1",
         IdMap.getId("payment-collection-not-authorized"),
         [IdMap.getId("payCol_session1"), IdMap.getId("payCol_session2")]
       )
@@ -677,6 +693,7 @@ describe("PaymentCollectionService", () => {
 
     it("should skip authorized sessions - partially authorized", async () => {
       await paymentCollectionService.authorizePaymentSessions(
+        "1",
         IdMap.getId("payment-collection-partial"),
         [IdMap.getId("payCol_session1"), IdMap.getId("payCol_session2")]
       )
@@ -690,6 +707,7 @@ describe("PaymentCollectionService", () => {
 
     it("should skip authorized sessions - fully authorized", async () => {
       await paymentCollectionService.authorizePaymentSessions(
+        "1",
         IdMap.getId("payment-collection-fully"),
         [IdMap.getId("payCol_session1"), IdMap.getId("payCol_session2")]
       )
