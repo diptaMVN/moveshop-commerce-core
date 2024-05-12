@@ -80,7 +80,7 @@ describe("CartService", () => {
         newTotalsService: newTotalsServiceMock,
         featureFlagRouter: new FlagRouter({}),
       })
-      result = await cartService.retrieve(IdMap.getId("emptyCart"))
+      result = await cartService.retrieve("1", IdMap.getId("emptyCart"))
     })
 
     it("calls cart model functions", () => {
@@ -428,7 +428,11 @@ describe("CartService", () => {
         unit_price: 123,
         quantity: 10,
       }
-      await cartService.addLineItem(IdMap.getId("emptyCart"), _.clone(lineItem))
+      await cartService.addLineItem(
+        "1",
+        IdMap.getId("emptyCart"),
+        _.clone(lineItem)
+      )
 
       expect(eventBusService.emit).toHaveBeenCalledTimes(1)
       expect(eventBusService.emit).toHaveBeenCalledWith(
@@ -469,7 +473,11 @@ describe("CartService", () => {
         quantity: 10,
       }
 
-      await cartService.addLineItem(IdMap.getId("emptyCart"), _.clone(lineItem))
+      await cartService.addLineItem(
+        "1",
+        IdMap.getId("emptyCart"),
+        _.clone(lineItem)
+      )
 
       expect(eventBusService.emit).toHaveBeenCalledTimes(1)
       expect(eventBusService.emit).toHaveBeenCalledWith(
@@ -506,7 +514,7 @@ describe("CartService", () => {
         metadata: {},
       }
 
-      await cartService.addLineItem(IdMap.getId("cartWithLine"), lineItem)
+      await cartService.addLineItem("1", IdMap.getId("cartWithLine"), lineItem)
 
       expect(lineItemService.update).toHaveBeenCalledTimes(2)
       expect(lineItemService.update).toHaveBeenNthCalledWith(
@@ -543,7 +551,7 @@ describe("CartService", () => {
       }
 
       await expect(
-        cartService.addLineItem(IdMap.getId("cartWithLine"), lineItem)
+        cartService.addLineItem("1", IdMap.getId("cartWithLine"), lineItem)
       ).rejects.toThrow(
         `Variant with id: ${IdMap.getId(
           "cannot-cover"
@@ -654,13 +662,18 @@ describe("CartService", () => {
         quantity: 10,
       }
 
-      await cartService.addLineItem(IdMap.getId("cartWithLine"), lineItem, {
-        validateSalesChannels: false,
-      })
+      await cartService.addLineItem(
+        "1",
+        IdMap.getId("cartWithLine"),
+        lineItem,
+        {
+          validateSalesChannels: false,
+        }
+      )
 
       expect(cartService.validateLineItem).not.toHaveBeenCalled()
 
-      await cartService.addLineItem(IdMap.getId("cartWithLine"), lineItem)
+      await cartService.addLineItem("1", IdMap.getId("cartWithLine"), lineItem)
 
       expect(cartService.validateLineItem).toHaveBeenCalledTimes(1)
 
@@ -739,6 +752,7 @@ describe("CartService", () => {
 
     it("successfully removes a line item", async () => {
       await cartService.removeLineItem(
+        "1",
         IdMap.getId("cartWithLine"),
         IdMap.getId("itemToRemove")
       )
@@ -774,6 +788,7 @@ describe("CartService", () => {
 
     it("removes shipping method if not necessary", async () => {
       await cartService.removeLineItem(
+        "1",
         IdMap.getId("withShipping"),
         IdMap.getId("itemToRemove")
       )
@@ -810,6 +825,7 @@ describe("CartService", () => {
 
     it("resolves if line item is not in cart", async () => {
       await cartService.removeLineItem(
+        "1",
         IdMap.getId("cartWithLine"),
         IdMap.getId("nonExisting")
       )
@@ -963,6 +979,7 @@ describe("CartService", () => {
 
     it("successfully updates existing line item", async () => {
       await cartService.updateLineItem(
+        "1",
         IdMap.getId("cartWithLine"),
         IdMap.getId("existingUpdate"),
         { quantity: 2 }
@@ -999,6 +1016,7 @@ describe("CartService", () => {
     it("throws if inventory isn't covered", async () => {
       await expect(
         cartService.updateLineItem(
+          "1",
           IdMap.getId("cannot"),
           IdMap.getId("existing"),
           { quantity: 2 }
@@ -1048,7 +1066,7 @@ describe("CartService", () => {
     })
 
     it("successfully updates an email", async () => {
-      await cartService.update(IdMap.getId("emptyCart"), {
+      await cartService.update("1", IdMap.getId("emptyCart"), {
         email: "test@testDom.com",
       })
 
@@ -1073,7 +1091,7 @@ describe("CartService", () => {
     })
 
     it("creates a new customer", async () => {
-      await cartService.update(IdMap.getId("emptyCart"), {
+      await cartService.update("1", IdMap.getId("emptyCart"), {
         email: "no@Mail.com",
       })
 
@@ -1095,7 +1113,9 @@ describe("CartService", () => {
 
     it("throws on invalid email", async () => {
       await expect(
-        cartService.update(IdMap.getId("emptyCart"), { email: "test@test" })
+        cartService.update("1", IdMap.getId("emptyCart"), {
+          email: "test@test",
+        })
       ).rejects.toThrow("The email is not valid")
     })
   })
@@ -1137,7 +1157,7 @@ describe("CartService", () => {
         phone: "+1 (222) 333 4444",
       }
 
-      await cartService.update(IdMap.getId("emptyCart"), {
+      await cartService.update("1", IdMap.getId("emptyCart"), {
         billing_address: address,
       })
 
@@ -1198,7 +1218,7 @@ describe("CartService", () => {
         phone: "+1 (222) 333 4444",
       }
 
-      await cartService.update(IdMap.getId("emptyCart"), {
+      await cartService.update("1", IdMap.getId("emptyCart"), {
         shipping_address: address,
       })
 
@@ -1234,7 +1254,7 @@ describe("CartService", () => {
       }
 
       await expect(
-        cartService.update(IdMap.getId("emptyCart"), {
+        cartService.update("1", IdMap.getId("emptyCart"), {
           shipping_address: address,
         })
       ).rejects.toThrow("Shipping country must be in the cart region")
@@ -1377,7 +1397,7 @@ describe("CartService", () => {
     })
 
     it("successfully set new region", async () => {
-      await cartService.update(IdMap.getId("fr-cart"), {
+      await cartService.update("1", IdMap.getId("fr-cart"), {
         region_id: IdMap.getId("region-us"),
       })
 
@@ -1698,7 +1718,7 @@ describe("CartService", () => {
     })
 
     it("initializes payment sessions for each of the providers", async () => {
-      await cartService.setPaymentSessions(IdMap.getId("cartWithLine"))
+      await cartService.setPaymentSessions("1", IdMap.getId("cartWithLine"))
 
       expect(paymentSessionRepositoryMock.create).toHaveBeenCalledTimes(2)
       expect(paymentSessionRepositoryMock.save).toHaveBeenCalledTimes(2)
@@ -1722,6 +1742,7 @@ describe("CartService", () => {
 
     it("delete or update payment sessions remotely depending if they are selected and/or initiated", async () => {
       await cartService.setPaymentSessions(
+        "1",
         IdMap.getId("cartWithMixedSelectedInitiatedSessions")
       )
 
@@ -1746,7 +1767,7 @@ describe("CartService", () => {
     })
 
     it("filters sessions not available in the region", async () => {
-      await cartService.setPaymentSessions(IdMap.getId("cart-to-filter"))
+      await cartService.setPaymentSessions("1", IdMap.getId("cart-to-filter"))
 
       expect(paymentSessionRepositoryMock.create).toHaveBeenCalledTimes(1)
       expect(paymentSessionRepositoryMock.save).toHaveBeenCalledTimes(2) // create and update
@@ -1757,7 +1778,7 @@ describe("CartService", () => {
     })
 
     it("removes if cart total === 0", async () => {
-      await cartService.setPaymentSessions(IdMap.getId("cart-remove"))
+      await cartService.setPaymentSessions("1", IdMap.getId("cart-remove"))
 
       expect(paymentSessionRepositoryMock.remove).toHaveBeenCalledTimes(2)
 
@@ -1770,7 +1791,7 @@ describe("CartService", () => {
     })
 
     it("removes if cart total < 0", async () => {
-      await cartService.setPaymentSessions(IdMap.getId("cart-negative"))
+      await cartService.setPaymentSessions("1", IdMap.getId("cart-negative"))
 
       expect(paymentSessionRepositoryMock.remove).toHaveBeenCalledTimes(2)
 
@@ -1928,8 +1949,13 @@ describe("CartService", () => {
         extra: "yes",
       }
 
-      await cartService.addShippingMethod(IdMap.getId("cart"), IdMap.getId("option"), data)
-        expect(shippingOptionService.createShippingMethod).toHaveBeenCalledWith(
+      await cartService.addShippingMethod(
+        "1",
+        IdMap.getId("cart"),
+        IdMap.getId("option"),
+        data
+      )
+      expect(shippingOptionService.createShippingMethod).toHaveBeenCalledWith(
         IdMap.getId("option"),
         data,
         { cart: cart1 }
@@ -1940,8 +1966,13 @@ describe("CartService", () => {
       const data = {
         id: "testshipperid",
       }
-      await cartService.addShippingMethod(IdMap.getId("existing"), IdMap.getId("profile1"), data)
-        expect(shippingOptionService.createShippingMethod).toHaveBeenCalledWith(
+      await cartService.addShippingMethod(
+        "1",
+        IdMap.getId("existing"),
+        IdMap.getId("profile1"),
+        data
+      )
+      expect(shippingOptionService.createShippingMethod).toHaveBeenCalledWith(
         IdMap.getId("profile1"),
         data,
         { cart: cart2 }
@@ -1959,9 +1990,14 @@ describe("CartService", () => {
         id: "additional_shipper_id",
       }
 
-      await cartService.addShippingMethod(IdMap.getId("existing"), IdMap.getId("additional"), data)
+      await cartService.addShippingMethod(
+        "1",
+        IdMap.getId("existing"),
+        IdMap.getId("additional"),
+        data
+      )
 
-        expect(shippingOptionService.deleteShippingMethods).toHaveBeenCalledTimes(
+      expect(shippingOptionService.deleteShippingMethods).toHaveBeenCalledTimes(
         0
       )
       expect(shippingOptionService.createShippingMethod).toHaveBeenCalledTimes(
@@ -1979,9 +2015,14 @@ describe("CartService", () => {
         id: "shipper",
       }
 
-      await cartService.addShippingMethod(IdMap.getId("lines"), IdMap.getId("profile1"), data)
+      await cartService.addShippingMethod(
+        "1",
+        IdMap.getId("lines"),
+        IdMap.getId("profile1"),
+        data
+      )
 
-        expect(shippingOptionService.deleteShippingMethods).toHaveBeenCalledTimes(
+      expect(shippingOptionService.deleteShippingMethods).toHaveBeenCalledTimes(
         0
       )
       expect(shippingOptionService.createShippingMethod).toHaveBeenCalledTimes(
@@ -2013,8 +2054,13 @@ describe("CartService", () => {
           }
         })
 
-      await cartService.addShippingMethod(IdMap.getId("cart-with-custom-so"), IdMap.getId("test-so"), data)
-        expect(shippingOptionService.createShippingMethod).toHaveBeenCalledWith(
+      await cartService.addShippingMethod(
+        "1",
+        IdMap.getId("cart-with-custom-so"),
+        IdMap.getId("test-so"),
+        data
+      )
+      expect(shippingOptionService.createShippingMethod).toHaveBeenCalledWith(
         IdMap.getId("test-so"),
         data,
         {
@@ -2275,7 +2321,7 @@ describe("CartService", () => {
     })
 
     it("successfully applies discount to cart", async () => {
-      await cartService.update(IdMap.getId("fr-cart"), {
+      await cartService.update("1", IdMap.getId("fr-cart"), {
         discounts: [
           {
             code: "10%OFF",
@@ -2335,7 +2381,7 @@ describe("CartService", () => {
     })
 
     it("successfully applies discount to cart and removes old one", async () => {
-      await cartService.update(IdMap.getId("with-d"), {
+      await cartService.update("1", IdMap.getId("with-d"), {
         discounts: [{ code: "10%OFF" }],
       })
 
@@ -2386,7 +2432,7 @@ describe("CartService", () => {
     })
 
     it("successfully applies free shipping", async () => {
-      await cartService.update(IdMap.getId("with-d"), {
+      await cartService.update("1", IdMap.getId("with-d"), {
         discounts: [{ code: "10%OFF" }, { code: "FREESHIPPING" }],
       })
 
@@ -2446,7 +2492,7 @@ describe("CartService", () => {
     })
 
     it("successfully applies discount with a check for customer applicableness", async () => {
-      await cartService.update("with-d-and-customer", {
+      await cartService.update("1", "with-d-and-customer", {
         discounts: [
           {
             code: "ApplicableForCustomer",
@@ -2482,7 +2528,7 @@ describe("CartService", () => {
     })
 
     it("successfully remove all discounts that have been applied", async () => {
-      await cartService.update(IdMap.getId("with-d"), {
+      await cartService.update("1", IdMap.getId("with-d"), {
         discounts: [],
       })
 
@@ -2561,7 +2607,7 @@ describe("CartService", () => {
     })
 
     it("successfully removes discount", async () => {
-      await cartService.removeDiscount(IdMap.getId("fr-cart"), "1234")
+      await cartService.removeDiscount("1", IdMap.getId("fr-cart"), "1234")
 
       expect(LineItemAdjustmentServiceMock.delete).toHaveBeenCalledTimes(1)
       expect(

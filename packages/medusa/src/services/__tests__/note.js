@@ -30,6 +30,7 @@ describe("NoteService", () => {
 
     it("calls note model functions", async () => {
       await noteService.list(
+        "1",
         { resource_id: IdMap.getId("note") },
         {
           relations: ["author"],
@@ -70,7 +71,9 @@ describe("NoteService", () => {
     })
 
     it("calls note model functions", async () => {
-      await noteService.retrieve(IdMap.getId("note"), { relations: ["author"] })
+      await noteService.retrieve("1", IdMap.getId("note"), {
+        relations: ["author"],
+      })
 
       expect(noteRepo.findOne).toHaveBeenCalledTimes(1)
       expect(noteRepo.findOne).toHaveBeenCalledWith({
@@ -81,7 +84,7 @@ describe("NoteService", () => {
 
     it("fails when note is not found", async () => {
       await expect(
-        noteService.retrieve(IdMap.getId("not-existing"))
+        noteService.retrieve("1", IdMap.getId("not-existing"))
       ).rejects.toThrow(
         `Note with id: ${IdMap.getId("not-existing")} was not found.`
       )
