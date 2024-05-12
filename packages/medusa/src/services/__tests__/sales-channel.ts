@@ -80,11 +80,15 @@ describe("SalesChannelService", () => {
       await salesChannelService.createDefault()
 
       expect(salesChannelRepositoryMock.save).toHaveBeenCalledTimes(1)
-      expect(salesChannelRepositoryMock.save).toHaveBeenCalledWith({
-        description: "Created by Medusa",
-        name: "Default Sales Channel",
-        is_disabled: false,
-      })
+      expect(salesChannelRepositoryMock.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          description:
+            "This is sales channel created default. By default your product assign this sales channel",
+          name: "Online store",
+          is_disabled: false,
+          store_id: "test-store",
+        })
+      )
     })
 
     it("should return the default sales channel if it already exists", async () => {
@@ -134,6 +138,7 @@ describe("SalesChannelService", () => {
 
     it("should retrieve a sales channel", async () => {
       const salesChannel = await salesChannelService.retrieve(
+        "1",
         IdMap.getId("sales_channel_1")
       )
 
@@ -144,7 +149,7 @@ describe("SalesChannelService", () => {
       })
 
       expect(salesChannelRepositoryMock.findOne).toHaveBeenLastCalledWith({
-        where: { id: IdMap.getId("sales_channel_1") },
+        where: { id: IdMap.getId("sales_channel_1"), store_id: "1" },
         relationLoadStrategy: "query",
       })
     })
@@ -170,7 +175,7 @@ describe("SalesChannelService", () => {
     })
 
     it("calls save with the updated sales channel", async () => {
-      await salesChannelService.update(IdMap.getId("sc"), update)
+      await salesChannelService.update("1", IdMap.getId("sc"), update)
       expect(salesChannelRepositoryMock.save).toHaveBeenCalledWith({
         id: IdMap.getId("sc"),
         ...update,
@@ -178,7 +183,11 @@ describe("SalesChannelService", () => {
     })
 
     it("returns the saved sales channel", async () => {
-      const res = await salesChannelService.update(IdMap.getId("sc"), update)
+      const res = await salesChannelService.update(
+        "1",
+        IdMap.getId("sc"),
+        update
+      )
       expect(res).toEqual({
         id: IdMap.getId("sc"),
         ...update,
@@ -283,6 +292,7 @@ describe("SalesChannelService", () => {
 
     it("should soft remove a sales channel", async () => {
       const res = await salesChannelService.delete(
+        "1",
         IdMap.getId("sales_channel_1")
       )
 
@@ -303,7 +313,7 @@ describe("SalesChannelService", () => {
 
     it("should fail if delete of the default channel is attempted", async () => {
       try {
-        await salesChannelService.delete("default_channel")
+        await salesChannelService.delete("1", "default_channel")
       } catch (error) {
         expect(error.message).toEqual(
           "You cannot delete the default sales channel"
@@ -327,6 +337,7 @@ describe("SalesChannelService", () => {
 
     it("should remove a list of product to a sales channel", async () => {
       const salesChannel = await salesChannelService.removeProducts(
+        "1",
         IdMap.getId("sales_channel_1"),
         [IdMap.getId("sales_channel_1_product_1")]
       )
@@ -359,6 +370,7 @@ describe("SalesChannelService", () => {
 
     it("should add a list of product to a sales channel", async () => {
       const salesChannel = await salesChannelService.addProducts(
+        "1",
         IdMap.getId("sales_channel_1"),
         [IdMap.getId("sales_channel_1_product_1")]
       )
