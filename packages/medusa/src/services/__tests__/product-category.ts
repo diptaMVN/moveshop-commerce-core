@@ -4,7 +4,9 @@ import {
   invalidProdCategoryId,
   productCategoryRepositoryMock as productCategoryRepository,
   validProdCategoryId,
-  validProdCategoryIdWithChildren, validProdCategoryRankChange, validProdCategoryWithSiblings
+  validProdCategoryIdWithChildren,
+  validProdCategoryRankChange,
+  validProdCategoryWithSiblings,
 } from "../../repositories/__mocks__/product-category"
 import { tempReorderRank } from "../../types/product-category"
 import { EventBusServiceMock as eventBusService } from "../__mocks__/event-bus"
@@ -12,34 +14,41 @@ import { EventBusServiceMock as eventBusService } from "../__mocks__/event-bus"
 const productCategoryService = new ProductCategoryService({
   manager,
   productCategoryRepository,
-  eventBusService: eventBusService as unknown as EventBusService
+  eventBusService: eventBusService as unknown as EventBusService,
 })
 
 describe("ProductCategoryService", () => {
-  beforeEach(async () => { jest.clearAllMocks() })
+  beforeEach(async () => {
+    jest.clearAllMocks()
+  })
 
   describe("retrieve", () => {
     it("successfully retrieves a product category", async () => {
       const validID = IdMap.getId(validProdCategoryId)
-      const result = await productCategoryService.retrieve(
-        validID
-      )
+      const result = await productCategoryService.retrieve("1", validID)
 
       expect(result.id).toEqual(validID)
-      expect(productCategoryRepository.findOneWithDescendants).toHaveBeenCalledTimes(1)
-      expect(productCategoryRepository.findOneWithDescendants).toHaveBeenCalledWith({
-        where: { id: validID },
-      }, {})
+      expect(
+        productCategoryRepository.findOneWithDescendants
+      ).toHaveBeenCalledTimes(1)
+      expect(
+        productCategoryRepository.findOneWithDescendants
+      ).toHaveBeenCalledWith(
+        {
+          where: { id: validID, store_id: "1" },
+        },
+        {}
+      )
     })
 
     it("fails on not-found product category id", async () => {
       const invalidID = IdMap.getId(invalidProdCategoryId)
       const categoryResponse = await productCategoryService
-        .retrieve(invalidID)
+        .retrieve("1", invalidID)
         .catch((e) => e)
 
       expect(categoryResponse.message).toBe(
-        `ProductCategory with id: ${invalidID} was not found`
+        `ProductCategory with id: ${invalidID}, store_id: 1 was not found`
       )
     })
   })
@@ -47,15 +56,20 @@ describe("ProductCategoryService", () => {
   describe("listAndCount", () => {
     it("successfully retrieves an array of product category", async () => {
       const validID = IdMap.getId(validProdCategoryId)
-      const [result, count] = await productCategoryService
-        .listAndCount({ q: validID })
+      const [result, count] = await productCategoryService.listAndCount({
+        q: validID,
+      })
 
       expect(count).toEqual(1)
       expect(result.length).toEqual(1)
       expect(result[0].id).toEqual(validID)
-      expect(productCategoryRepository.getFreeTextSearchResultsAndCount).toHaveBeenCalledTimes(1)
+      expect(
+        productCategoryRepository.getFreeTextSearchResultsAndCount
+      ).toHaveBeenCalledTimes(1)
       expect(productCategoryRepository.findDescendantsTree).not.toBeCalled()
-      expect(productCategoryRepository.getFreeTextSearchResultsAndCount).toHaveBeenCalledWith(
+      expect(
+        productCategoryRepository.getFreeTextSearchResultsAndCount
+      ).toHaveBeenCalledWith(
         {
           skip: 0,
           take: 100,
@@ -63,13 +77,14 @@ describe("ProductCategoryService", () => {
         },
         validID,
         {},
-        false,
+        false
       )
     })
 
     it("returns empty array if query doesn't match database results", async () => {
-      const [result, count] = await productCategoryService
-        .listAndCount({ q: IdMap.getId(invalidProdCategoryId) })
+      const [result, count] = await productCategoryService.listAndCount({
+        q: IdMap.getId(invalidProdCategoryId),
+      })
 
       expect(
         productCategoryRepository.getFreeTextSearchResultsAndCount
@@ -80,12 +95,17 @@ describe("ProductCategoryService", () => {
 
     it("successfully calls tree descendants when requested to be included", async () => {
       const validID = IdMap.getId(validProdCategoryId)
-      const [result, count] = await productCategoryService
-        .listAndCount({ include_descendants_tree: true })
+      const [result, count] = await productCategoryService.listAndCount({
+        include_descendants_tree: true,
+      })
 
       expect(result[0].id).toEqual(validID)
-      expect(productCategoryRepository.getFreeTextSearchResultsAndCount).toHaveBeenCalledTimes(1)
-      expect(productCategoryRepository.getFreeTextSearchResultsAndCount).toHaveBeenCalledWith(
+      expect(
+        productCategoryRepository.getFreeTextSearchResultsAndCount
+      ).toHaveBeenCalledTimes(1)
+      expect(
+        productCategoryRepository.getFreeTextSearchResultsAndCount
+      ).toHaveBeenCalledWith(
         {
           skip: 0,
           take: 100,
@@ -93,24 +113,31 @@ describe("ProductCategoryService", () => {
         },
         undefined,
         {},
-        true,
+        true
       )
     })
   })
 
   describe("create", () => {
     it("successfully creates a product category", async () => {
-      await productCategoryService.create({ name: validProdCategoryId })
+      await productCategoryService.create({
+        name: validProdCategoryId,
+        store_id: "1",
+      })
 
       expect(productCategoryRepository.create).toHaveBeenCalledTimes(1)
       expect(productCategoryRepository.create).toHaveBeenCalledWith({
         name: validProdCategoryId,
         rank: 0,
+        store_id: "1",
       })
     })
 
     it("emits a message on successful create", async () => {
-      await productCategoryService.create({ name: validProdCategoryId })
+      await productCategoryService.create({
+        name: validProdCategoryId,
+        store_id: "1",
+      })
 
       expect(eventBusService.emit).toHaveBeenCalledTimes(1)
       expect(eventBusService.emit).toHaveBeenCalledWith(
@@ -125,6 +152,7 @@ describe("ProductCategoryService", () => {
   describe("delete", () => {
     it("successfully deletes a product category", async () => {
       const result = await productCategoryService.delete(
+        "1",
         IdMap.getId(validProdCategoryId)
       )
 
@@ -135,24 +163,29 @@ describe("ProductCategoryService", () => {
     })
 
     it("returns without failure on not-found product category id", async () => {
-      const categoryResponse = await productCategoryService
-        .delete(IdMap.getId(invalidProdCategoryId))
+      const categoryResponse = await productCategoryService.delete(
+        "1",
+        IdMap.getId(invalidProdCategoryId)
+      )
 
       expect(categoryResponse).toBe(undefined)
     })
 
     it("fails on product category with children", async () => {
       const categoryResponse = await productCategoryService
-        .delete(IdMap.getId(validProdCategoryIdWithChildren))
+        .delete("1", IdMap.getId(validProdCategoryIdWithChildren))
         .catch((e) => e)
 
       expect(categoryResponse.message).toBe(
-        `Deleting ProductCategory (${IdMap.getId(validProdCategoryIdWithChildren)}) with category children is not allowed`
+        `Deleting ProductCategory (${IdMap.getId(
+          validProdCategoryIdWithChildren
+        )}) with category children is not allowed`
       )
     })
 
     it("emits a message on successful delete", async () => {
       const result = await productCategoryService.delete(
+        "1",
         IdMap.getId(validProdCategoryId)
       )
 
@@ -167,11 +200,14 @@ describe("ProductCategoryService", () => {
 
     it("deleting a category shifts its siblings into the correct rank", async () => {
       const result = await productCategoryService.delete(
+        "1",
         IdMap.getId(validProdCategoryWithSiblings)
       )
 
       expect(productCategoryRepository.delete).toBeCalledTimes(1)
-      expect(productCategoryRepository.delete).toBeCalledWith(IdMap.getId(validProdCategoryWithSiblings))
+      expect(productCategoryRepository.delete).toBeCalledWith(
+        IdMap.getId(validProdCategoryWithSiblings)
+      )
 
       expect(productCategoryRepository.save).toBeCalledTimes(1)
       expect(productCategoryRepository.save).toBeCalledWith({
@@ -185,9 +221,13 @@ describe("ProductCategoryService", () => {
 
   describe("update", () => {
     it("successfully updates a product category", async () => {
-      await productCategoryService.update(IdMap.getId(validProdCategoryId), {
-        name: "bathrobes",
-      })
+      await productCategoryService.update(
+        "1",
+        IdMap.getId(validProdCategoryId),
+        {
+          name: "bathrobes",
+        }
+      )
 
       expect(productCategoryRepository.save).toHaveBeenCalledTimes(1)
       expect(productCategoryRepository.save).toHaveBeenCalledWith(
@@ -200,8 +240,10 @@ describe("ProductCategoryService", () => {
 
     it("successfully updates a product category rank and its siblings", async () => {
       await productCategoryService.update(
-        IdMap.getId(validProdCategoryRankChange), {
-          rank: 0
+        "1",
+        IdMap.getId(validProdCategoryRankChange),
+        {
+          rank: 0,
         }
       )
 
@@ -209,21 +251,21 @@ describe("ProductCategoryService", () => {
       expect(productCategoryRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           id: IdMap.getId(validProdCategoryRankChange),
-          rank: tempReorderRank
+          rank: tempReorderRank,
         })
       )
 
       expect(productCategoryRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           id: IdMap.getId(validProdCategoryWithSiblings),
-          rank: 1
+          rank: 1,
         })
       )
     })
 
     it("fails on not-found Id product category", async () => {
       const error = await productCategoryService
-        .update(IdMap.getId(invalidProdCategoryId), {
+        .update("1", IdMap.getId(invalidProdCategoryId), {
           name: "bathrobes",
         })
         .catch((e) => e)
@@ -231,12 +273,13 @@ describe("ProductCategoryService", () => {
       expect(error.message).toBe(
         `ProductCategory with id: ${IdMap.getId(
           invalidProdCategoryId
-        )} was not found`
+        )}, store_id: 1 was not found`
       )
     })
 
     it("emits a message on successful update", async () => {
       const result = await productCategoryService.update(
+        "1",
         IdMap.getId(validProdCategoryId),
         {
           name: "bathrobes",

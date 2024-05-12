@@ -24,6 +24,7 @@ const customerGroupService = {
       return Promise.resolve({ id: IdMap.getId("group") })
     }
 
+    // !have to fix this code for failure in the test
     throw new MedusaError(
       MedusaError.Types.NOT_FOUND,
       `CustomerGroup with id ${id} was not found`
@@ -53,11 +54,15 @@ describe("PriceListService", () => {
 
   describe("retrieve", () => {
     it("successfully retrieves a price list", async () => {
-      const result = await priceListService.retrieve(IdMap.getId("ironman"))
-
+      const result = await priceListService.retrieve(
+        "1",
+        IdMap.getId("ironman")
+      )
       expect(priceListRepository.findOne).toHaveBeenCalledTimes(1)
+      // !have to fix this code for failure in the test
       expect(priceListRepository.findOne).toHaveBeenCalledWith({
-        where: { id: IdMap.getId("ironman") },
+        where: { id: IdMap.getId("ironman"), store_id: "1" },
+        select: { id: true },
       })
 
       expect(result.id).toEqual(IdMap.getId("ironman"))
@@ -65,7 +70,7 @@ describe("PriceListService", () => {
 
     it("fails on non-existing product variant id", async () => {
       try {
-        await priceListService.retrieve(IdMap.getId("batman"))
+        await priceListService.retrieve("1", IdMap.getId("batman"))
       } catch (error) {
         expect(error.message).toBe(
           `Price list with id: ${IdMap.getId("batman")} was not found`
@@ -76,7 +81,7 @@ describe("PriceListService", () => {
 
   describe("create", () => {
     it("creates a new Price List", async () => {
-      await priceListService.create({
+      await priceListService.create("1", {
         name: "VIP winter sale",
         description: "Winter sale for VIP customers. 25% off selected items.",
         type: "sale",
@@ -93,7 +98,6 @@ describe("PriceListService", () => {
           },
         ],
       })
-
       expect(priceListRepository.create).toHaveBeenCalledTimes(1)
       expect(priceListRepository.create).toHaveBeenCalledWith({
         name: "VIP winter sale",
@@ -105,6 +109,7 @@ describe("PriceListService", () => {
       })
       expect(customerGroupService.retrieve).toHaveBeenCalledTimes(1)
       expect(customerGroupService.retrieve).toHaveBeenCalledWith(
+        "1",
         IdMap.getId("group")
       )
       expect(moneyAmountRepository.addPriceListPrices).toHaveBeenCalledTimes(1)
@@ -148,7 +153,7 @@ describe("PriceListService", () => {
     })
 
     it("update only existing price lists and related money amount", async () => {
-      await updateRelatedPriceListService.update(IdMap.getId("ironman"), {
+      await updateRelatedPriceListService.update("1", IdMap.getId("ironman"), {
         description: "Updated description",
         name: "Updated name",
         prices: [
@@ -167,7 +172,7 @@ describe("PriceListService", () => {
     })
 
     it("update only existing and create new price lists and related money amount", async () => {
-      await updateRelatedPriceListService.update(IdMap.getId("ironman"), {
+      await updateRelatedPriceListService.update("1", IdMap.getId("ironman"), {
         description: "Updated description",
         name: "Updated name",
         prices: [

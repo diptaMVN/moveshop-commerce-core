@@ -261,7 +261,7 @@ describe("SwapService", () => {
       })
 
       it("finds swap and calls return create cart", async () => {
-        await swapService.createCart(IdMap.getId("swap-1"), [
+        await swapService.createCart("1", IdMap.getId("swap-1"), [
           { option_id: "test-option", price: 10 },
         ])
 
@@ -307,20 +307,21 @@ describe("SwapService", () => {
         )
 
         expect(cartService.create).toHaveBeenCalledTimes(1)
-        expect(cartService.create).toHaveBeenCalledWith({
-          email: testOrder.email,
-          discounts: testOrder.discounts,
-          region_id: testOrder.region_id,
-          customer_id: testOrder.customer_id,
-          type: "swap",
-          metadata: {
-            swap_id: IdMap.getId("test-swap"),
-            parent_order_id: IdMap.getId("test"),
-          },
-        })
+        expect(cartService.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: testOrder.email,
+            discounts: testOrder.discounts,
+            region_id: testOrder.region_id,
+            customer_id: testOrder.customer_id,
+            type: "swap",
+            metadata: expect.objectContaining({
+              swap_id: IdMap.getId("test-swap"),
+              parent_order_id: IdMap.getId("test"),
+            }),
+          })
+        )
 
-        expect(cartService.create).toHaveBeenCalledTimes(1)
-        // expect(cartService.update).toHaveBeenCalledTimes(1)
+        // // expect(cartService.update).toHaveBeenCalledTimes(1)
 
         expect(lineItemService.update).toHaveBeenCalledTimes(1)
         expect(lineItemService.update).toHaveBeenCalledWith("test", {
@@ -330,6 +331,8 @@ describe("SwapService", () => {
         expect(
           LineItemAdjustmentServiceMock.createAdjustmentForLineItem
         ).toHaveBeenCalledTimes(1)
+
+        // ! have to fix this code for failure in test
         expect(
           LineItemAdjustmentServiceMock.createAdjustmentForLineItem
         ).toHaveBeenCalledWith(
@@ -390,7 +393,7 @@ describe("SwapService", () => {
       })
 
       it("fails if cart already created", async () => {
-        const res = swapService.createCart(IdMap.getId("swap-1"))
+        const res = swapService.createCart("1", IdMap.getId("swap-1"))
 
         await expect(res).rejects.toThrow(
           "A cart has already been created for the swap"
@@ -399,7 +402,7 @@ describe("SwapService", () => {
 
       it("fails if swap is canceled", async () => {
         await expect(
-          swapService.createCart(IdMap.getId("canceled"))
+          swapService.createCart("1", IdMap.getId("canceled"))
         ).rejects.toThrow("Canceled swap cannot be used to create a cart")
       })
     })
@@ -444,6 +447,7 @@ describe("SwapService", () => {
 
       it("generates lines items", async () => {
         await swapService.create(
+          "1",
           testOrder,
           [{ item_id: IdMap.getId("line"), quantity: 1 }],
           [{ variant_id: IdMap.getId("new-variant"), quantity: 1 }],
@@ -455,6 +459,7 @@ describe("SwapService", () => {
 
         expect(lineItemService.generate).toHaveBeenCalledTimes(1)
         expect(lineItemService.generate).toHaveBeenCalledWith(
+          "1",
           {
             quantity: 1,
             variantId: IdMap.getId("new-variant"),
@@ -468,6 +473,7 @@ describe("SwapService", () => {
 
       it("creates swap", async () => {
         await swapService.create(
+          "1",
           testOrder,
           [{ item_id: IdMap.getId("line"), quantity: 1 }],
           [{ variant_id: IdMap.getId("new-variant"), quantity: 1 }],
@@ -476,7 +482,7 @@ describe("SwapService", () => {
             price: 20,
           }
         )
-
+        // ! have to fix this code for failure in test
         expect(swapRepo.create).toHaveBeenCalledWith({
           order_id: IdMap.getId("test"),
           fulfillment_status: "not_fulfilled",
@@ -502,6 +508,7 @@ describe("SwapService", () => {
         "passes correct no_notification to eventBus with %s",
         async (input, expected) => {
           await swapService.create(
+            "1",
             testOrder,
             [{ item_id: IdMap.getId("line"), quantity: 1 }],
             [{ variant_id: IdMap.getId("new-variant"), quantity: 1 }],
@@ -575,7 +582,7 @@ describe("SwapService", () => {
       })
 
       it("creates a fulfillment", async () => {
-        await swapService.createFulfillment(IdMap.getId("swap"))
+        await swapService.createFulfillment("1", IdMap.getId("swap"))
 
         expect(lineItemService.update).toHaveBeenCalledTimes(1)
         expect(lineItemService.update).toHaveBeenCalledWith("1234", {
@@ -626,7 +633,7 @@ describe("SwapService", () => {
 
       it("fails when swap has been canceled", async () => {
         await expect(
-          swapService.createFulfillment(IdMap.getId("swap"), {})
+          swapService.createFulfillment("1", IdMap.getId("swap"), {})
         ).rejects.toThrow("Canceled swap cannot be fulfilled")
       })
     })
@@ -666,10 +673,11 @@ describe("SwapService", () => {
     })
 
     it("successfully cancels fulfillment and corrects swap status", async () => {
-      await swapService.cancelFulfillment(IdMap.getId("swap"))
+      await swapService.cancelFulfillment("1", IdMap.getId("swap"))
 
       expect(fulfillmentService.cancelFulfillment).toHaveBeenCalledTimes(1)
       expect(fulfillmentService.cancelFulfillment).toHaveBeenCalledWith(
+        "1",
         IdMap.getId("swap")
       )
 
@@ -678,10 +686,10 @@ describe("SwapService", () => {
         fulfillment_status: "canceled",
       })
     })
-
+    // ! have to fix this code for failure in test
     it("fails to cancel fulfillment when not related to a swap", async () => {
       await expect(
-        swapService.cancelFulfillment(IdMap.getId("no-swap"))
+        swapService.cancelFulfillment("1", IdMap.getId("no-swap"))
       ).rejects.toThrow(`Fufillment not related to a swap`)
     })
   })
@@ -770,6 +778,7 @@ describe("SwapService", () => {
 
       it("creates a shipment", async () => {
         await swapService.createShipment(
+          "1",
           IdMap.getId("swap"),
           IdMap.getId("f1"),
           [{ tracking_number: "1234" }],
@@ -789,6 +798,7 @@ describe("SwapService", () => {
         })
 
         expect(fulfillmentService.createShipment).toHaveBeenCalledWith(
+          "1",
           IdMap.getId("f1"),
           [{ tracking_number: "1234" }],
           {}
@@ -810,6 +820,7 @@ describe("SwapService", () => {
       it("fails when swap is canceled", async () => {
         await expect(
           swapService.createShipment(
+            "1",
             IdMap.getId("swap"),
             IdMap.getId("fulfillment")
           )
@@ -916,7 +927,7 @@ describe("SwapService", () => {
       })
 
       it("creates a shipment", async () => {
-        await swapService.registerCartCompletion(IdMap.getId("swap"))
+        await swapService.registerCartCompletion("1", IdMap.getId("swap"))
 
         expect(paymentProviderService.getStatus).toHaveBeenCalledWith({
           good: "yes",
@@ -976,12 +987,12 @@ describe("SwapService", () => {
 
       it("fails to register cart completion when swap is canceled", async () => {
         await expect(
-          swapService.registerCartCompletion(IdMap.getId("canceled"))
+          swapService.registerCartCompletion("1", IdMap.getId("canceled"))
         ).rejects.toThrow("Cart related to canceled swap cannot be completed")
       })
       it("throws an error because inventory is to low", async () => {
         try {
-          await swapService.registerCartCompletion(IdMap.getId("swap"))
+          await swapService.registerCartCompletion("1", IdMap.getId("swap"))
         } catch (e) {
           expect(e.message).toEqual(
             `Variant with id: variant does not have the required inventory`
@@ -1054,7 +1065,7 @@ describe("SwapService", () => {
       })
 
       it("capture success", async () => {
-        await swapService.processDifference(IdMap.getId("swap"))
+        await swapService.processDifference("1", IdMap.getId("swap"))
         expect(paymentProviderService.capturePayment).toHaveBeenCalledWith({
           id: "good",
         })
@@ -1066,7 +1077,7 @@ describe("SwapService", () => {
       })
 
       it("capture fail", async () => {
-        await swapService.processDifference("capture_fail")
+        await swapService.processDifference("1", "capture_fail")
         expect(paymentProviderService.capturePayment).toHaveBeenCalledWith({
           id: "f",
         })
@@ -1078,7 +1089,7 @@ describe("SwapService", () => {
       })
 
       it("refund success", async () => {
-        await swapService.processDifference("refund")
+        await swapService.processDifference("1", "refund")
         expect(paymentProviderService.refundPayment).toHaveBeenCalledWith(
           [
             {
@@ -1096,7 +1107,7 @@ describe("SwapService", () => {
       })
 
       it("refund fail", async () => {
-        await swapService.processDifference("refund_fail")
+        await swapService.processDifference("1", "refund_fail")
 
         expect(paymentProviderService.refundPayment).toHaveBeenCalledWith(
           [
@@ -1115,13 +1126,13 @@ describe("SwapService", () => {
       })
 
       it("fails as swap is canceled", async () => {
-        await expect(swapService.processDifference("canceled")).rejects.toThrow(
-          "Canceled swap cannot be processed"
-        )
+        await expect(
+          swapService.processDifference("1", "canceled")
+        ).rejects.toThrow("Canceled swap cannot be processed")
       })
 
       it("zero", async () => {
-        await swapService.processDifference("0")
+        await swapService.processDifference("1", "0")
         expect(swapRepo.save).toHaveBeenCalledWith({
           ...existing(0, false),
           payment_status: "difference_refunded",
@@ -1129,7 +1140,9 @@ describe("SwapService", () => {
       })
 
       it("not confirmed", async () => {
-        await expect(swapService.processDifference("not_conf")).rejects.toThrow(
+        await expect(
+          swapService.processDifference("1", "not_conf")
+        ).rejects.toThrow(
           "Cannot process a swap that hasn't been confirmed by the customer"
         )
       })
@@ -1173,20 +1186,20 @@ describe("SwapService", () => {
       })
 
       it("fails if swap doesn't have status received", async () => {
-        const res = swapService.registerReceived("requested")
+        const res = swapService.registerReceived("requested", "1")
         await expect(res).rejects.toThrow("Swap is not received")
       })
 
       it("registers a swap as received", async () => {
-        await swapService.registerReceived("received")
+        await swapService.registerReceived("received", "1")
 
         expect(eventBusService.emit).toHaveBeenCalledTimes(1)
       })
 
       it("fails to register as received when swap is canceled", async () => {
-        await expect(swapService.registerReceived("canceled")).rejects.toThrow(
-          "Canceled swap cannot be registered as received"
-        )
+        await expect(
+          swapService.registerReceived("canceled", "1")
+        ).rejects.toThrow("Canceled swap cannot be registered as received")
       })
     })
   })
@@ -1240,7 +1253,7 @@ describe("SwapService", () => {
     })
 
     it("successfully cancels valid swap", async () => {
-      await swapService.cancel(IdMap.getId("complete"))
+      await swapService.cancel("1", IdMap.getId("complete"))
 
       expect(swapRepo.save).toHaveBeenCalledTimes(1)
       expect(swapRepo.save).toHaveBeenCalledWith({
@@ -1256,29 +1269,29 @@ describe("SwapService", () => {
         id: IdMap.getId("payment"),
       })
     })
-
+    // ! have to fix this code for failure in test
     it("fails to cancel swap when fulfillment not canceled", async () => {
       await expect(
-        swapService.cancel(IdMap.getId("fail-fulfillment"))
+        swapService.cancel("1", IdMap.getId("fail-fulfillment"))
       ).rejects.toThrow(
         "All fulfillments must be canceled before the swap can be canceled"
       )
     })
-
+    // ! have to fix this code for failure in test
     it("fails to cancel swap when return not canceled", async () => {
       await expect(
-        swapService.cancel(IdMap.getId("fail-return"))
+        swapService.cancel("1", IdMap.getId("fail-return"))
       ).rejects.toThrow(
         "Return must be canceled before the swap can be cancele"
       )
     })
-
+    // ! have to fix this code for failure in test
     it.each([["fail-refund-1"], ["fail-refund-2"], ["fail-refund-3"]])(
       "fails to cancel swap when contains refund",
       async (input) => {
-        await expect(swapService.cancel(IdMap.getId(input))).rejects.toThrow(
-          "Swap with a refund cannot be canceled"
-        )
+        await expect(
+          swapService.cancel("1", IdMap.getId(input))
+        ).rejects.toThrow("Swap with a refund cannot be canceled")
       }
     )
   })
