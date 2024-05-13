@@ -23,11 +23,11 @@ describe("UserService", () => {
     })
 
     it("successfully retrieves a user", async () => {
-      const result = await userService.retrieve(IdMap.getId("ironman"))
+      const result = await userService.retrieve("1", IdMap.getId("ironman"))
 
       expect(userRepository.find).toHaveBeenCalledTimes(1)
       expect(userRepository.find).toHaveBeenCalledWith({
-        where: { id: IdMap.getId("ironman") },
+        where: { id: IdMap.getId("ironman"), store_id: "1" },
       })
 
       expect(result.id).toEqual(IdMap.getId("ironman"))
@@ -91,7 +91,7 @@ describe("UserService", () => {
     })
 
     it("successfully updates user", async () => {
-      await userService.update(IdMap.getId("ironman"), {
+      await userService.update("1", IdMap.getId("ironman"), {
         first_name: "Tony",
         last_name: "Stark",
       })
@@ -112,7 +112,7 @@ describe("UserService", () => {
     })
 
     it("successfully updates user metadata", async () => {
-      await userService.update(IdMap.getId("ironman"), {
+      await userService.update("1", IdMap.getId("ironman"), {
         metadata: {
           company: "Stark Industries",
         },
@@ -136,7 +136,7 @@ describe("UserService", () => {
 
     it("fails on email update", async () => {
       try {
-        await userService.update(IdMap.getId("ironman"), {
+        await userService.update("1", IdMap.getId("ironman"), {
           email: "tony@stark.com",
         })
       } catch (error) {
@@ -146,7 +146,7 @@ describe("UserService", () => {
 
     it("fails on password update", async () => {
       try {
-        await userService.update(IdMap.getId("ironman"), {
+        await userService.update("1", IdMap.getId("ironman"), {
           password_hash: "lol",
         })
       } catch (error) {
@@ -175,9 +175,9 @@ describe("UserService", () => {
 
     it("generates a token successfully", async () => {
       const token = await userService.generateResetPasswordToken(
+        "1",
         IdMap.getId("ironman")
       )
-
       expect(token).toMatch(
         /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/
       )
