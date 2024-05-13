@@ -608,6 +608,7 @@ describe("ProductVariantService", () => {
 
     it("successfully retrieves region price", async () => {
       const result = await productVariantService.getRegionPrice(
+        "1",
         IdMap.getId("ironman"),
         IdMap.getId("california")
       )
@@ -617,6 +618,7 @@ describe("ProductVariantService", () => {
 
     it("successfully retrieves region sale price", async () => {
       const result = await productVariantService.getRegionPrice(
+        "1",
         IdMap.getId("ironman-sale"),
         IdMap.getId("california")
       )
@@ -628,6 +630,7 @@ describe("ProductVariantService", () => {
     it("fails if no price is found", async () => {
       try {
         await productVariantService.getRegionPrice(
+          "1",
           IdMap.getId("ironmanv2"),
           IdMap.getId("california")
         )
