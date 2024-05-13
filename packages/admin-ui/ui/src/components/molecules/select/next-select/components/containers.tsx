@@ -7,6 +7,7 @@ import {
   ValueContainerProps,
 } from "react-select"
 import InputError from "../../../../atoms/input-error"
+import Button from "../../../../fundamentals/button";
 
 type AdjacentContainerProps = {
   label?: string
@@ -184,7 +185,7 @@ export const IndicatorsContainer = <
         clsx("text-grey-50 gap-x-small px-small flex items-center", className)
       )}
     >
-      {children}
+        {/*<Button className='h-[34px]  rounded-[7px]' variant="primary"> Find products {children}</Button>*/}
     </div>
   )
 }

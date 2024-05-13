@@ -3,13 +3,13 @@ import { Controller, useWatch } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import Spinner from "../../../../components/atoms/spinner"
 import Button from "../../../../components/fundamentals/button"
-import AlertIcon from "../../../../components/fundamentals/icons/alert-icon"
 import TrashIcon from "../../../../components/fundamentals/icons/trash-icon"
 import { SteppedContext } from "../../../../components/molecules/modal/stepped-modal"
 import Select from "../../../../components/molecules/select"
 import CurrencyInput from "../../../../components/organisms/currency-input"
 import { extractOptionPrice } from "../../../../utils/prices"
 import { useNewOrderForm } from "../form"
+import TruckIcon from "../../../../components/fundamentals/icons/truck-icon"
 
 const SelectShippingMethod = () => {
   const { t } = useTranslation()
@@ -53,30 +53,22 @@ const SelectShippingMethod = () => {
   }, [selectedShippingOption])
 
   return (
-    <div className="min-h-[705px]">
-      <span className="inter-base-semibold">
-        Shipping method{" "}
-        <span className="inter-base-regular text-grey-50">
-          {t("select-shipping-to-name", "(To {{name}})", {
-            name: region!.name,
-          })}
-        </span>
-      </span>
-
+    <div className="pb-8">
       {region ? (
         !shippingOptions?.length ? (
-          <div className="inter-small-regular bg-orange-5 rounded-rounded mt-6 flex p-4 text-orange-50">
-            <div className="mr-3 h-full">
-              <AlertIcon size={20} />
+          <div className="flex flex-col items-center justify-center">
+            <div className="bg-grey-100 mb-4 flex h-[90px] w-[90px] items-center justify-center rounded-[50%]">
+              <TruckIcon size={54} />
             </div>
-            <div className="flex flex-col">
-              <span className="inter-small-semibold">
-                {t("components-attention", "Attention!")}
-              </span>
-              {t(
-                "components-no-options-for-orders-without-shipping",
-                'You don\'t have any options for orders without shipping. Please add one (e.g. "In-store fulfillment") with "Show on website" unchecked in region settings and continue.'
-              )}
+            <div className="flex flex-col items-center justify-center text-center">
+              <h3>
+                Add your Shipping MethodAdd your Shipping MethodAdd your
+                Shipping your Shipping MethodAdd your Shipping MethodAdd your
+                Shipping Method
+              </h3>
+              <Button className="mt-6" variant="primary">
+                Add Shipping Method
+              </Button>
             </div>
           </div>
         ) : (
@@ -121,7 +113,7 @@ const SelectShippingMethod = () => {
                 </div>
               )}
               {showCustomPrice && (
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <div className="w-full">
                     <Controller
                       control={control}
@@ -150,7 +142,7 @@ const SelectShippingMethod = () => {
                     variant="ghost"
                     size="small"
                     onClick={removeCustomPrice}
-                    className="text-grey-40 ml-8 h-8 w-8"
+                    className="text-grey-40 ml-8 mt-7 h-8 w-8"
                   >
                     <TrashIcon size={20} />
                   </Button>

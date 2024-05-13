@@ -19,6 +19,7 @@ export const ModalContext = React.createContext<ModalState>({
 export type ModalProps = {
   isLargeModal?: boolean
   handleClose: () => void
+  handleSkip: () => void
   open?: boolean
   children?: React.ReactNode
 }
@@ -32,6 +33,8 @@ type ModalChildProps = {
 type ModalHeaderProps = {
   handleClose: () => void
   children?: React.ReactNode
+  className?: string
+  iconClass?: string
 }
 
 type ModalType = React.FC<ModalProps> & {
@@ -43,7 +46,7 @@ type ModalType = React.FC<ModalProps> & {
 
 const Overlay: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
-    <Dialog.Overlay className="bg-grey-90/40 fixed top-0 bottom-0 left-0 right-0 z-50 grid place-items-center overflow-y-auto">
+    <Dialog.Overlay className="bg-grey-90/40 fixed bottom-0 left-0 right-0 top-0 z-50 grid place-items-center overflow-y-auto">
       {children}
     </Dialog.Overlay>
   )
@@ -122,14 +125,14 @@ Modal.Content = ({ children, className }) => {
   )
 }
 
-Modal.Header = ({ handleClose = undefined, children }) => {
+Modal.Header = ({ handleClose = undefined, children, className, iconClass="self-end" }) => {
   return (
     <div
-      className="flex w-full items-center border-b px-8 py-6"
+      className={`flex w-full items-center border-b px-8 py-6 bg-gray-100 ${className}`}
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex flex-grow">{children}</div>
-      <div className="self-end">
+      <div className={iconClass}>
         {handleClose && (
           <Button
             variant="ghost"

@@ -13,7 +13,7 @@ import Discounts from "../domain/discounts"
 import GiftCards from "../domain/gift-cards"
 import Inventory from "../domain/inventory"
 import Oauth from "../domain/oauth"
-import Orders from "../domain/orders"
+import Orders from "../domain/ms-orders"
 import DraftOrders from "../domain/orders/draft-orders"
 import PriceListRoute from "../domain/pricing"
 import ProductCategories from "../domain/product-categories"
@@ -23,6 +23,8 @@ import SalesChannels from "../domain/sales-channels"
 import Settings from "../domain/settings"
 import { useRoutes } from "../providers/route-provider"
 import { isRoute } from "../utils/extensions"
+import Home from "../domain/home"
+import CreateOrder from "../domain/orders/create"
 
 const IndexPage = () => {
   const navigate = useNavigate()
@@ -44,8 +46,17 @@ const DashboardRoutes = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <Layout>
-        <SEO title="Medusa" />
+        <SEO title="MoveShop" />
         <Routes>
+          {/* in future apply */}
+
+          <Route path="manual-orders/*" element={<h1>manual-orders</h1>} />
+          <Route
+            path="abandoned-checkouts/*"
+            element={<h1>Abandoned Checkouts</h1>}
+          />
+          <Route path="my-store/*" element={<h1>My Store</h1>} />
+          {/* end */}
           <Route path="oauth/:app_name" element={<Oauth />} />
           <Route path="products/*" element={<ProductsRoute />} />
           <Route path="product-categories/*" element={<ProductCategories />} />
@@ -53,11 +64,21 @@ const DashboardRoutes = () => {
           <Route path="gift-cards/*" element={<GiftCards />} />
           <Route path="orders/*" element={<Orders />} />
           <Route path="draft-orders/*" element={<DraftOrders />} />
+          <Route path="order/create" element={<CreateOrder />} />
           <Route path="discounts/*" element={<Discounts />} />
           <Route path="customers/*" element={<Customers />} />
           <Route path="pricing/*" element={<PriceListRoute />} />
           <Route path="settings/*" element={<Settings />} />
           <Route path="sales-channels/*" element={<SalesChannels />} />
+          <Route path="home/*" element={<Home />} />
+          <Route path="content/*" element={<h1>Content</h1>} />
+
+          <Route
+            path="social-media-channels/*"
+            element={<h1>Social Media channels</h1>}
+          />
+          <Route path="app-store/*" element={<h1>App Store</h1>} />
+          <Route path="installed-apps/*" element={<h1>Installed Apps</h1>} />
           <Route
             path="publishable-api-keys/*"
             element={<PublishableApiKeys />}
