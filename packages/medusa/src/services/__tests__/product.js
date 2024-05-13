@@ -60,11 +60,11 @@ describe("ProductService", () => {
     })
 
     it("successfully retrieves a product", async () => {
-      const result = await productService.retrieve(IdMap.getId("ironman"))
+      const result = await productService.retrieve(IdMap.getId("ironman"), "1")
 
       expect(productRepo.findOneWithRelations).toHaveBeenCalledTimes(1)
       expect(productRepo.findOneWithRelations).toHaveBeenCalledWith([], {
-        where: { id: IdMap.getId("ironman") },
+        where: { id: IdMap.getId("ironman"), store_id: "1" },
       })
 
       expect(result.id).toEqual(IdMap.getId("ironman"))
@@ -141,6 +141,7 @@ describe("ProductService", () => {
 
     it("should successfully create a product", async () => {
       await productService.create({
+        store_id: "1",
         title: "Suit",
         options: [],
         tags: [{ value: "title" }, { value: "title2" }],
@@ -165,6 +166,7 @@ describe("ProductService", () => {
 
       expect(productRepository.create).toHaveBeenCalledTimes(1)
       expect(productRepository.create).toHaveBeenCalledWith({
+        store_id: "1",
         title: "Suit",
       })
 
@@ -294,7 +296,7 @@ describe("ProductService", () => {
     })
 
     it("successfully updates product metadata", async () => {
-      await productService.update(IdMap.getId("ironman"), {
+      await productService.update(IdMap.getId("ironman"), "1", {
         metadata: { some_key: "some_value" },
       })
 
@@ -312,7 +314,7 @@ describe("ProductService", () => {
     })
 
     it("successfully updates product status", async () => {
-      await productService.update(IdMap.getId("ironman"), {
+      await productService.update(IdMap.getId("ironman"), "1", {
         status: "published",
       })
 
@@ -324,7 +326,7 @@ describe("ProductService", () => {
     })
 
     it("successfully updates product", async () => {
-      await productService.update(IdMap.getId("ironman"), {
+      await productService.update(IdMap.getId("ironman"), "1", {
         title: "Full suit",
         collection: {
           id: IdMap.getId("test"),
@@ -350,7 +352,7 @@ describe("ProductService", () => {
     })
 
     it("successfully updates tags", async () => {
-      await productService.update(IdMap.getId("ironman"), {
+      await productService.update(IdMap.getId("ironman"), "1", {
         tags: [
           { id: IdMap.getId("test"), value: "test" },
           { id: IdMap.getId("test2"), value: "test2" },
@@ -375,9 +377,11 @@ describe("ProductService", () => {
 
     it("throws on non existing product", async () => {
       try {
-        await productService.update("123", { title: "new title" })
+        await productService.update("123", "1", { title: "new title" })
       } catch (err) {
-        expect(err.message).toEqual("Product with id: 123 was not found")
+        expect(err.message).toEqual(
+          "Product with id: 123, store_id: 1 was not found"
+        )
       }
     })
   })
@@ -398,7 +402,7 @@ describe("ProductService", () => {
       jest.clearAllMocks()
     })
     it("successfully deletes product", async () => {
-      await productService.delete(IdMap.getId("ironman"))
+      await productService.delete("1", IdMap.getId("ironman"))
 
       expect(productRepository.softRemove).toBeCalledTimes(1)
       expect(productRepository.softRemove).toBeCalledWith({
@@ -447,7 +451,7 @@ describe("ProductService", () => {
     })
 
     it("creates product option", async () => {
-      await productService.addOption(IdMap.getId("ironman"), "Material")
+      await productService.addOption(IdMap.getId("ironman"), "1", "Material")
 
       expect(productOptionRepository.create).toHaveBeenCalledWith({
         title: "Material",
@@ -506,7 +510,7 @@ describe("ProductService", () => {
     })
 
     it("reorders variants", async () => {
-      await productService.reorderVariants(IdMap.getId("ironman"), [
+      await productService.reorderVariants(IdMap.getId("ironman"), "1", [
         IdMap.getId("blue"),
         IdMap.getId("green"),
       ])
@@ -520,7 +524,7 @@ describe("ProductService", () => {
 
     it("throws if a variant id is not in the products variants", async () => {
       try {
-        await productService.reorderVariants(IdMap.getId("ironman"), [
+        await productService.reorderVariants(IdMap.getId("ironman"), "1", [
           IdMap.getId("yellow"),
           IdMap.getId("blue"),
         ])
@@ -533,7 +537,7 @@ describe("ProductService", () => {
 
     it("throws if order length and product variant lengths differ", async () => {
       try {
-        await productService.reorderVariants(IdMap.getId("ironman"), [
+        await productService.reorderVariants(IdMap.getId("ironman"), "1", [
           IdMap.getId("blue"),
         ])
       } catch (err) {
@@ -576,6 +580,7 @@ describe("ProductService", () => {
     it("updates option title", async () => {
       await productService.updateOption(
         IdMap.getId("ironman"),
+        "1",
         IdMap.getId("color"),
         {
           title: "Suit color",
@@ -593,6 +598,7 @@ describe("ProductService", () => {
       try {
         await productService.updateOption(
           IdMap.getId("ironman"),
+          "1",
           IdMap.getId("color"),
           {
             title: "Color",
@@ -607,6 +613,7 @@ describe("ProductService", () => {
       try {
         await productService.updateOption(
           IdMap.getId("ironman"),
+          "1",
           IdMap.getId("material"),
           {
             title: "Size",
@@ -684,6 +691,7 @@ describe("ProductService", () => {
     it("deletes an option from a product", async () => {
       await productService.deleteOption(
         IdMap.getId("ironman"),
+        "1",
         IdMap.getId("color")
       )
 
@@ -697,6 +705,7 @@ describe("ProductService", () => {
     it("resolve if product option does not exist", async () => {
       await productService.deleteOption(
         IdMap.getId("ironman"),
+        "1",
         IdMap.getId("material")
       )
 
@@ -707,6 +716,7 @@ describe("ProductService", () => {
       try {
         await productService.deleteOption(
           IdMap.getId("ironman"),
+          "1",
           IdMap.getId("color")
         )
       } catch (error) {
