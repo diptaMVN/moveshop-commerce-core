@@ -19,7 +19,7 @@ describe("StoreService", () => {
     })
 
     it("successfully creates store with default currency", async () => {
-      await storeService.create()
+      await storeService.create("1")
 
       expect(storeRepository.create).toHaveBeenCalledTimes(1)
       expect(storeRepository.save).toHaveBeenCalledTimes(1)
@@ -75,7 +75,7 @@ describe("StoreService", () => {
     })
 
     it("successfully updates store", async () => {
-      await storeService.update({
+      await storeService.update("1", {
         name: "Medusa Commerce",
       })
 
@@ -91,7 +91,7 @@ describe("StoreService", () => {
 
     it("fails if currency not ok", async () => {
       await expect(
-        storeService.update({
+        storeService.update("1", {
           currencies: ["1cd", "usd"],
         })
       ).rejects.toThrow("Currency with code 1cd does not exist")
@@ -136,7 +136,7 @@ describe("StoreService", () => {
     })
 
     it("successfully adds currency", async () => {
-      await storeService.addCurrency("sek")
+      await storeService.addCurrency("1", "sek")
 
       expect(storeRepository.find).toHaveBeenCalledTimes(1)
 
@@ -149,13 +149,13 @@ describe("StoreService", () => {
     })
 
     it("fails if currency not ok", async () => {
-      await expect(storeService.addCurrency("1cd")).rejects.toThrow(
+      await expect(storeService.addCurrency("1", "1cd")).rejects.toThrow(
         "Currency 1cd not found"
       )
     })
 
     it("fails if currency already existis", async () => {
-      await expect(storeService.addCurrency("dkk")).rejects.toThrow(
+      await expect(storeService.addCurrency("1", "dkk")).rejects.toThrow(
         "Currency already added"
       )
 
@@ -199,7 +199,7 @@ describe("StoreService", () => {
     })
 
     it("successfully removes currency", async () => {
-      await storeService.removeCurrency("dkk")
+      await storeService.removeCurrency("1", "dkk")
 
       expect(storeRepository.find).toHaveBeenCalledTimes(1)
 
