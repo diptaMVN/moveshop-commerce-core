@@ -39,6 +39,7 @@ describe("PublishableApiKeyService", () => {
 
   it("should retrieve a publishable api key and call the repository with the right arguments", async () => {
     await publishableApiKeyService.retrieve(
+      "1",
       IdMap.getId("order-edit-with-changes")
     )
     expect(publishableApiKeyRepository.findOne).toHaveBeenCalledTimes(1)
@@ -46,13 +47,14 @@ describe("PublishableApiKeyService", () => {
       relationLoadStrategy: "query",
       where: {
         id: IdMap.getId("order-edit-with-changes"),
+        store_id: "1",
       },
     })
   })
 
   it("should create a publishable api key and call the repository with the right arguments as well as the event bus service", async () => {
     await publishableApiKeyService.create(
-      { title: "API key title" },
+      { title: "API key title", store_id: "1" },
       {
         loggedInUserId: IdMap.getId("admin_user"),
       }
@@ -62,8 +64,10 @@ describe("PublishableApiKeyService", () => {
     expect(publishableApiKeyRepository.create).toHaveBeenCalledWith({
       created_by: IdMap.getId("admin_user"),
       title: "API key title",
+      store_id: "1",
     })
     expect(EventBusServiceMock.emit).toHaveBeenCalledTimes(1)
+    // ! have to fix this code later(failing tests)
     expect(EventBusServiceMock.emit).toHaveBeenCalledWith(
       PublishableApiKeyService.Events.CREATED,
       { id: expect.any(String) }
@@ -71,7 +75,7 @@ describe("PublishableApiKeyService", () => {
   })
 
   it("should update a publishable api key", async () => {
-    await publishableApiKeyService.update(pubKeyToRetrieve.id, {
+    await publishableApiKeyService.update("1", pubKeyToRetrieve.id, {
       title: "new title",
     })
 
@@ -84,7 +88,7 @@ describe("PublishableApiKeyService", () => {
   })
 
   it("should revoke a publishable api key", async () => {
-    await publishableApiKeyService.revoke("id", {
+    await publishableApiKeyService.revoke("1", "id", {
       loggedInUserId: IdMap.getId("admin_user"),
     })
 
