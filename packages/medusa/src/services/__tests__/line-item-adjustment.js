@@ -41,7 +41,7 @@ describe("LineItemAdjustmentService", () => {
         where: {
           item_id: "li-1",
         },
-        relations: { "item": true },
+        relations: { item: true },
       })
     })
   })
@@ -78,7 +78,7 @@ describe("LineItemAdjustmentService", () => {
       expect(lineItemAdjustmentRepo.findOne).toHaveBeenCalledTimes(1)
       expect(lineItemAdjustmentRepo.findOne).toHaveBeenCalledWith({
         where: { id: "lia-1" },
-        relations: { "item": true },
+        relations: { item: true },
       })
     })
 
@@ -269,13 +269,13 @@ describe("LineItemAdjustmentService", () => {
       }
       const lineItem = { id: "li-1" }
 
-      lineItemAdjustmentService.createAdjustments(cart, lineItem)
+      lineItemAdjustmentService.createAdjustments("1", cart, lineItem)
       expect(
         lineItemAdjustmentService.createAdjustmentForLineItem
       ).toHaveBeenCalledTimes(1)
       expect(
         lineItemAdjustmentService.createAdjustmentForLineItem
-      ).toHaveBeenCalledWith(cart, lineItem)
+      ).toHaveBeenCalledWith("1", cart, lineItem)
     })
 
     it("calls createAdjustmentForLineItem 3 times when given a cart containing 3 line items", () => {
@@ -295,13 +295,13 @@ describe("LineItemAdjustmentService", () => {
         ],
       }
 
-      lineItemAdjustmentService.createAdjustments(cart)
+      lineItemAdjustmentService.createAdjustments("1", cart)
       expect(
         lineItemAdjustmentService.createAdjustmentForLineItem
       ).toHaveBeenCalledTimes(3)
       expect(
         lineItemAdjustmentService.createAdjustmentForLineItem
-      ).toHaveBeenNthCalledWith(1, cart, { id: "li-2" })
+      ).toHaveBeenNthCalledWith(1, "1", cart, { id: "li-2" })
     })
   })
 })
