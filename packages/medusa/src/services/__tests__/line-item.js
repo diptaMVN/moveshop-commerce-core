@@ -150,6 +150,7 @@ const unknownVariantId = "unknown-variant"
 
         it("successfully create a line item giftcard", async () => {
           const line = await lineItemService.generate(
+            "1",
             IdMap.getId("test-giftcard"),
             IdMap.getId("test-region"),
             1
@@ -421,6 +422,7 @@ describe("LineItemService", () => {
 
       it("successfully create a line item with tax inclusive set to true", async () => {
         await lineItemService.generate(
+          "1",
           IdMap.getId("test-variant"),
           IdMap.getId("test-region"),
           1
@@ -453,6 +455,7 @@ describe("LineItemService", () => {
 
       it("successfully create a line item with tax inclusive set to true by passing an object", async () => {
         await lineItemService.generate(
+          "1",
           {
             variantId: IdMap.getId("test-variant"),
             quantity: 1,
@@ -591,6 +594,7 @@ describe("LineItemService", () => {
       it("should not succeed to generate a line item if a variant id is not provided", async () => {
         const err = await lineItemService
           .generate(
+            "1",
             [
               {
                 variantId: "",
@@ -612,6 +616,7 @@ describe("LineItemService", () => {
       it("should not succeed to generate a line item if a variant id is not found", async () => {
         const err = await lineItemService
           .generate(
+            "1",
             [
               {
                 variantId: unknownVariantId,
@@ -632,6 +637,7 @@ describe("LineItemService", () => {
 
       it("successfully create a line item with tax inclusive set to false", async () => {
         await lineItemService.generate(
+          "1",
           IdMap.getId("test-variant"),
           IdMap.getId("test-region"),
           1
@@ -664,6 +670,7 @@ describe("LineItemService", () => {
 
       it("successfully create a line item with tax inclusive set to false by passing an object", async () => {
         await lineItemService.generate(
+          "1",
           {
             variantId: IdMap.getId("test-variant"),
             quantity: 1,
