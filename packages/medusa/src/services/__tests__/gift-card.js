@@ -50,7 +50,7 @@ describe("GiftCardService", () => {
     })
 
     it("correctly creates a giftcard", async () => {
-      await giftCardService.create(giftCard)
+      await giftCardService.create("1", giftCard)
 
       expect(giftCardRepo.create).toHaveBeenCalledTimes(1)
       expect(giftCardRepo.create).toHaveBeenCalledWith({
@@ -58,7 +58,8 @@ describe("GiftCardService", () => {
         order_id: IdMap.getId("order-id"),
         is_disabled: true,
         code: expect.any(String),
-        tax_rate: null
+        tax_rate: null,
+        store_id: "1",
       })
     })
   })
@@ -80,7 +81,7 @@ describe("GiftCardService", () => {
     })
 
     it("it calls order model functions", async () => {
-      await giftCardService.retrieve(IdMap.getId("gift-card"), {
+      await giftCardService.retrieve("1", IdMap.getId("gift-card"), {
         relations: ["region"],
         select: ["id"],
       })
@@ -90,7 +91,7 @@ describe("GiftCardService", () => {
         relationLoadStrategy: "query",
         relations: { region: true },
         select: { id: true },
-        where: { id: IdMap.getId("gift-card") },
+        where: { id: IdMap.getId("gift-card"), store_id: "1" },
       })
     })
   })
@@ -119,10 +120,10 @@ describe("GiftCardService", () => {
 
       expect(giftCardRepo.findOne).toHaveBeenCalledTimes(1)
       expect(giftCardRepo.findOne).toHaveBeenCalledWith({
-        "relationLoadStrategy": "query",
-        "relations": {"region": true},
-        "select": {"id": true},
-        "where": {"code": "1234-1234-1234-1234"}
+        relationLoadStrategy: "query",
+        relations: { region: true },
+        select: { id: true },
+        where: { code: "1234-1234-1234-1234" },
       })
     })
   })
@@ -166,7 +167,7 @@ describe("GiftCardService", () => {
     })
 
     it("calls order model functions", async () => {
-      await giftCardService.update(IdMap.getId("giftcard-id"), {
+      await giftCardService.update("1", IdMap.getId("giftcard-id"), {
         is_disabled: false,
         region_id: IdMap.getId("other-region"),
       })
@@ -184,7 +185,7 @@ describe("GiftCardService", () => {
       "fails to update balance with illegal input '%s'",
       async (input) => {
         await expect(
-          giftCardService.update(IdMap.getId("giftcard-id"), {
+          giftCardService.update("1", IdMap.getId("giftcard-id"), {
             balance: input,
           })
         ).rejects.toThrow("new balance is invalid")
@@ -222,7 +223,7 @@ describe("GiftCardService", () => {
     })
 
     it("successfully deletes existing gift-card", async () => {
-      await giftCardService.delete(IdMap.getId("gift-card"))
+      await giftCardService.delete("1", IdMap.getId("gift-card"))
 
       expect(giftCardRepo.softRemove).toHaveBeenCalledTimes(1)
       expect(giftCardRepo.softRemove).toHaveBeenCalledWith({
@@ -232,7 +233,7 @@ describe("GiftCardService", () => {
     })
 
     it("returns if no gift-card found", async () => {
-      await giftCardService.delete(IdMap.getId("other"))
+      await giftCardService.delete("1", IdMap.getId("other"))
 
       expect(giftCardRepo.softRemove).toHaveBeenCalledTimes(0)
     })
