@@ -44,6 +44,7 @@ describe("FulfillmentService", () => {
 
     it("successfully create a fulfillment", async () => {
       await fulfillmentService.createFulfillment(
+        "1",
         {
           shipping_methods: [
             {
@@ -71,12 +72,14 @@ describe("FulfillmentService", () => {
         items: [{ item_id: IdMap.getId("test-line"), quantity: 9 }],
         data: expect.anything(),
         metadata: {},
+        store_id: "1",
       })
     })
 
     it("throws if too many items are requested fulfilled", async () => {
       await expect(
         fulfillmentService.createFulfillment(
+          "1",
           {
             shipping_methods: [
               {
@@ -142,7 +145,10 @@ describe("FulfillmentService", () => {
     })
 
     it("correctly cancels fulfillment", async () => {
-      await fulfillmentService.cancelFulfillment(IdMap.getId("fulfillment"))
+      await fulfillmentService.cancelFulfillment(
+        "1",
+        IdMap.getId("fulfillment")
+      )
 
       expect(fulfillmentRepository.save).toHaveBeenCalledTimes(1)
       expect(fulfillmentRepository.save).toHaveBeenCalledWith({
@@ -186,6 +192,7 @@ describe("FulfillmentService", () => {
 
     it("calls order model functions", async () => {
       await fulfillmentService.createShipment(
+        "1",
         IdMap.getId("fulfillment"),
         [{ tracking_number: "1234" }, { tracking_number: "2345" }],
         {}
@@ -206,6 +213,7 @@ describe("FulfillmentService", () => {
     it("fails when status is canceled", async () => {
       await expect(
         fulfillmentService.createShipment(
+          "1",
           IdMap.getId("canceled"),
           [({ tracking_number: "1234" }, { tracking_number: "2345" })],
           {}
