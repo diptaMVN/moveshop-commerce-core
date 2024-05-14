@@ -245,6 +245,7 @@ describe("OrderEditService", () => {
 
   it("should update a line item  and create an item change to an order edit", async () => {
     await orderEditService.updateLineItem(
+      "1",
       IdMap.getId("order-edit-update-line-item"),
       IdMap.getId("line-item-1"),
       {
@@ -316,10 +317,14 @@ describe("OrderEditService", () => {
       .spyOn(orderEditService, "refreshAdjustments")
       .mockImplementation(async () => {})
 
-    await orderEditService.addLineItem(IdMap.getId("order-edit-with-changes"), {
-      variant_id: IdMap.getId("to-be-added-variant"),
-      quantity: 3,
-    })
+    await orderEditService.addLineItem(
+      "1",
+      IdMap.getId("order-edit-with-changes"),
+      {
+        variant_id: IdMap.getId("to-be-added-variant"),
+        quantity: 3,
+      }
+    )
 
     expect(LineItemServiceMock.generate).toHaveBeenCalledTimes(1)
     expect(orderEditService.refreshAdjustments).toHaveBeenCalledTimes(1)
