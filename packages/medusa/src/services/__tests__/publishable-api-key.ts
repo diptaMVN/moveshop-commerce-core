@@ -67,10 +67,9 @@ describe("PublishableApiKeyService", () => {
       store_id: "1",
     })
     expect(EventBusServiceMock.emit).toHaveBeenCalledTimes(1)
-    // ! have to fix this code later(failing tests)
     expect(EventBusServiceMock.emit).toHaveBeenCalledWith(
       PublishableApiKeyService.Events.CREATED,
-      { id: expect.any(String) }
+      { id: expect.any(String), store_id: "1" }
     )
   })
 
