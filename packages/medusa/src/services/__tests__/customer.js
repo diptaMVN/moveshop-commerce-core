@@ -30,11 +30,11 @@ describe("CustomerService", () => {
     })
 
     it("successfully retrieves a customer", async () => {
-      const result = await customerService.retrieve(IdMap.getId("ironman"))
+      const result = await customerService.retrieve("1", IdMap.getId("ironman"))
 
       expect(customerRepository.findOne).toHaveBeenCalledTimes(1)
       expect(customerRepository.findOne).toHaveBeenCalledWith({
-        where: { id: IdMap.getId("ironman") },
+        where: { id: IdMap.getId("ironman"), store_id: "1" },
       })
 
       expect(result.id).toEqual(IdMap.getId("ironman"))
@@ -80,12 +80,13 @@ describe("CustomerService", () => {
 
     it("successfully retrieves a registered customer by email", async () => {
       const result = await customerService.retrieveRegisteredByEmail(
+        "1",
         "tony@stark.com"
       )
 
       expect(customerRepository.findOne).toHaveBeenCalledTimes(1)
       expect(customerRepository.findOne).toHaveBeenCalledWith({
-        where: { email: "tony@stark.com", has_account: true },
+        where: { email: "tony@stark.com", has_account: true, store_id: "1" },
       })
 
       expect(result.id).toEqual(IdMap.getId("ironman"))
@@ -165,7 +166,7 @@ describe("CustomerService", () => {
     })
 
     it("successfully creates a customer with password", async () => {
-      await customerService.create({
+      await customerService.create("1", {
         email: "john@doe.com",
         first_name: "John",
         last_name: "Doe",
@@ -183,7 +184,7 @@ describe("CustomerService", () => {
     })
 
     it("calls listAndCount with email", async () => {
-      await customerService.create({
+      await customerService.create("1", {
         email: "john@doe.com",
         first_name: "John",
         last_name: "Doe",
@@ -197,6 +198,7 @@ describe("CustomerService", () => {
           take: 2,
           where: {
             email: "john@doe.com",
+            store_id: "1",
           },
         },
         undefined
@@ -204,7 +206,7 @@ describe("CustomerService", () => {
     })
 
     it("successfully creates a one time customer", async () => {
-      await customerService.create({
+      await customerService.create("1", {
         email: "john@doe.com",
         first_name: "John",
         last_name: "Doe",
@@ -221,7 +223,7 @@ describe("CustomerService", () => {
     it("Fails to create a customer with an existing account", async () => {
       expect.assertions(1)
       await customerService
-        .create({
+        .create("1", {
           email: "tony@stark.com",
           password: "stark123",
         })
@@ -257,7 +259,7 @@ describe("CustomerService", () => {
     })
 
     it("successfully updates a customer", async () => {
-      await customerService.update(IdMap.getId("ironman"), {
+      await customerService.update("1", IdMap.getId("ironman"), {
         first_name: "Olli",
         last_name: "Test",
       })
@@ -267,11 +269,12 @@ describe("CustomerService", () => {
         id: IdMap.getId("ironman"),
         first_name: "Olli",
         last_name: "Test",
+        store_id: "1",
       })
     })
 
     it("successfully updates customer metadata", async () => {
-      await customerService.update(IdMap.getId("ironman"), {
+      await customerService.update("1", IdMap.getId("ironman"), {
         metadata: {
           some: "test",
         },
@@ -283,11 +286,12 @@ describe("CustomerService", () => {
         metadata: {
           some: "test",
         },
+        store_id: "1",
       })
     })
 
     it("successfully updates with billing address", async () => {
-      await customerService.update(IdMap.getId("ironman"), {
+      await customerService.update("1", IdMap.getId("ironman"), {
         first_name: "Olli",
         last_name: "Test",
         billing_address: {
@@ -303,6 +307,7 @@ describe("CustomerService", () => {
 
       expect(customerRepository.save).toBeCalledTimes(1)
       expect(customerRepository.save).toBeCalledWith({
+        store_id: "1",
         id: IdMap.getId("ironman"),
         first_name: "Olli",
         last_name: "Test",
@@ -417,6 +422,7 @@ describe("CustomerService", () => {
 
       it("successfully deletes address", async () => {
         await customerService.removeAddress(
+          "1",
           IdMap.getId("ironman"),
           IdMap.getId("hollywood-boulevard")
         )
