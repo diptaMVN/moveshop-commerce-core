@@ -1199,7 +1199,7 @@ describe("DiscountService", () => {
   })
 
   describe("isValidForRegion", () => {
-    const retrieveMock = jest.fn().mockImplementation((id) => {
+    const retrieveMock = jest.fn().mockImplementation((store_id, id) => {
       if (id === "parent-discount-us") {
         return Promise.resolve({
           id,
@@ -1273,45 +1273,44 @@ describe("DiscountService", () => {
       expect(isValidForRegion).toBe(true)
     })
 
-    // it("returns false if discount has a parent discount and is not available in region", async () => {
-    //   const discount = {
-    //     id: "10off",
-    //     code: "10%OFF",
-    //     parent_discount_id: "parent-discount-us",
-    //   }
+    it("returns false if discount has a parent discount and is not available in region", async () => {
+      const discount = {
+        id: "10off",
+        code: "10%OFF",
+        parent_discount_id: "parent-discount-us",
+      }
 
-    //   const isValidForRegion = await discountService.isValidForRegion(
-    //     "1",
-    //     discount,
-    //     "dk"
-    //   )
+      const isValidForRegion = await discountService.isValidForRegion(
+        "1",
+        discount,
+        "dk"
+      )
 
-    //   // !! have to fix it later
-    //   // expect(retrieveMock).toBeCalledTimes(1)
-    //   // expect(retrieveMock).toBeCalledWith(discount.parent_discount_id, {
-    //   //   relations: ["rule", "regions"],
-    //   // })
-    //   // expect(isValidForRegion).toBe(false)
-    // })
+      expect(retrieveMock).toBeCalledTimes(1)
+      expect(retrieveMock).toBeCalledWith("1", discount.parent_discount_id, {
+        relations: ["rule", "regions"],
+      })
+      expect(isValidForRegion).toBe(false)
+    })
 
-    // it("returns true if discount has a parent discount and is available in region", async () => {
-    //   const discount = {
-    //     id: "10off",
-    //     code: "10%OFF",
-    //     parent_discount_id: "parent-discount-dk",
-    //   }
+    it("returns true if discount has a parent discount and is available in region", async () => {
+      const discount = {
+        id: "10off",
+        code: "10%OFF",
+        parent_discount_id: "parent-discount-dk",
+      }
 
-    //   const isValidForRegion = await discountService.isValidForRegion(
-    //     "1",
-    //     discount,
-    //     "dk"
-    //   )
-    //   // expect(retrieveMock).toBeCalledTimes(1)
-    //   // expect(retrieveMock).toBeCalledWith(discount.parent_discount_id, {
-    //   //   relations: ["rule", "regions"],
-    //   // })
-    //   // expect(isValidForRegion).toBe(true)
-    // })
+      const isValidForRegion = await discountService.isValidForRegion(
+        "1",
+        discount,
+        "dk"
+      )
+      expect(retrieveMock).toBeCalledTimes(1)
+      expect(retrieveMock).toBeCalledWith("1", discount.parent_discount_id, {
+        relations: ["rule", "regions"],
+      })
+      expect(isValidForRegion).toBe(true)
+    })
   })
 
   describe("canApplyForCustomer", () => {
