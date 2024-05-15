@@ -1325,7 +1325,7 @@ describe("DiscountService", () => {
       withTransaction: function () {
         return this
       },
-      retrieve: jest.fn().mockImplementation((id) => {
+      retrieve: jest.fn().mockImplementation((store_id, id) => {
         if (id === "customer-no-groups") {
           return Promise.resolve({ id: "customer-no-groups" })
         }
@@ -1361,16 +1361,14 @@ describe("DiscountService", () => {
         "rule-1",
         "customer-with-groups"
       )
-      // console.log("=========================>>>>>>", res)
+      expect(res).toBe(true)
 
-      // expect(res).toBe(true)
-
-      // expect(
-      //   discountConditionRepository.canApplyForCustomer
-      // ).toHaveBeenCalledTimes(1)
-      // expect(
-      //   discountConditionRepository.canApplyForCustomer
-      // ).toHaveBeenCalledWith("rule-1", "customer-with-groups")
+      expect(
+        discountConditionRepository.canApplyForCustomer
+      ).toHaveBeenCalledTimes(1)
+      expect(
+        discountConditionRepository.canApplyForCustomer
+      ).toHaveBeenCalledWith("rule-1", "customer-with-groups")
     })
   })
 })
