@@ -105,6 +105,7 @@ describe("OrderService", () => {
         if (query === "empty") {
           return Promise.resolve(emptyCart)
         }
+        console.log("====================>>>>>>", query)
         return Promise.resolve({
           id: "cart_id",
           email: "test@test.com",
@@ -164,87 +165,88 @@ describe("OrderService", () => {
       await expect(res).rejects.toThrow("Cannot create order from empty cart")
     })
 
-    // it("calls order model functions", async () => {
-    //   const cart = {
-    //     id: "cart_id",
-    //     email: "test@test.com",
-    //     customer_id: "cus_1234",
-    //     payment: {
-    //       id: "testpayment",
-    //       amount: 100,
-    //       status: "authorized",
-    //     },
-    //     region_id: "test",
-    //     region: {
-    //       id: "test",
-    //       currency_code: "eur",
-    //       name: "test",
-    //       tax_rate: 25,
-    //     },
-    //     shipping_address_id: "1234",
-    //     billing_address_id: "1234",
-    //     gift_cards: [],
-    //     discounts: [],
-    //     shipping_methods: [{ id: "method_1" }],
-    //     items: [
-    //       { id: "item_1", variant_id: "variant-1", quantity: 1 },
-    //       { id: "item_2", variant_id: "variant-2", quantity: 1 },
-    //     ],
-    //     total: 100,
-    //     subtotal: 100,
-    //     discount_total: 0,
-    //   }
+    it("calls order model functions", async () => {
+      const cart = {
+        id: "cart_id",
+        email: "test@test.com",
+        customer_id: "cus_1234",
+        payment: {
+          id: "testpayment",
+          amount: 100,
+          status: "authorized",
+        },
+        region_id: "test",
+        region: {
+          id: "test",
+          currency_code: "eur",
+          name: "test",
+          tax_rate: 25,
+        },
+        shipping_address_id: "1234",
+        billing_address_id: "1234",
+        gift_cards: [],
+        discounts: [],
+        shipping_methods: [{ id: "method_1" }],
+        items: [
+          { id: "item_1", variant_id: "variant-1", quantity: 1 },
+          { id: "item_2", variant_id: "variant-2", quantity: 1 },
+        ],
+        total: 100,
+        subtotal: 100,
+        discount_total: 0,
+      }
 
-    //   orderService.cartService_.retrieveWithTotals = jest.fn(() =>
-    //     Promise.resolve(cart)
-    //   )
+      orderService.cartService_.retrieveWithTotals = jest.fn(() =>
+        Promise.resolve(cart)
+      )
 
-    //   await orderService.createFromCart("1", "cart_id")
-    //   const order = {
-    //     payment_status: "awaiting",
-    //     email: cart.email,
-    //     customer_id: cart.customer_id,
-    //     shipping_methods: cart.shipping_methods,
-    //     discounts: cart.discounts,
-    //     billing_address_id: cart.billing_address_id,
-    //     shipping_address_id: cart.shipping_address_id,
-    //     region_id: cart.region_id,
-    //     currency_code: "eur",
-    //     cart_id: "cart_id",
-    //     gift_cards: [],
-    //     metadata: {},
-    //   }
+      await orderService.createFromCart("1", "cart_id")
 
-    //   expect(cartService.retrieveWithTotals).toHaveBeenCalledTimes(1)
-    //   expect(cartService.retrieveWithTotals).toHaveBeenCalledWith(
-    //     "1",
-    //     "cart_id",
-    //     {
-    //       relations: ["region", "payment", "items"],
-    //     }
-    //   )
+      const order = {
+        payment_status: "awaiting",
+        email: cart.email,
+        customer_id: cart.customer_id,
+        shipping_methods: cart.shipping_methods,
+        discounts: cart.discounts,
+        billing_address_id: cart.billing_address_id,
+        shipping_address_id: cart.shipping_address_id,
+        region_id: cart.region_id,
+        currency_code: "eur",
+        cart_id: "cart_id",
+        gift_cards: [],
+        metadata: {},
+      }
 
-    //   expect(paymentProviderService.updatePayment).toHaveBeenCalledTimes(1)
-    //   expect(paymentProviderService.updatePayment).toHaveBeenCalledWith(
-    //     "testpayment",
-    //     {
-    //       order_id: "id",
-    //     }
-    //   )
+      expect(cartService.retrieveWithTotals).toHaveBeenCalledTimes(1)
+      expect(cartService.retrieveWithTotals).toHaveBeenCalledWith(
+        "1",
+        "cart_id",
+        {
+          relations: ["region", "payment", "items"],
+        }
+      )
 
-    //   expect(lineItemService.update).toHaveBeenCalledTimes(2)
-    //   expect(lineItemService.update).toHaveBeenCalledWith("item_1", {
-    //     order_id: "id",
-    //   })
-    //   expect(lineItemService.update).toHaveBeenCalledWith("item_2", {
-    //     order_id: "id",
-    //   })
+      expect(paymentProviderService.updatePayment).toHaveBeenCalledTimes(1)
+      expect(paymentProviderService.updatePayment).toHaveBeenCalledWith(
+        "testpayment",
+        {
+          order_id: "id",
+        }
+      )
 
-    //   expect(orderRepo.create).toHaveBeenCalledTimes(1)
-    //   expect(orderRepo.create).toHaveBeenCalledWith(order)
-    //   expect(orderRepo.save).toHaveBeenCalledWith(order)
-    // })
+      expect(lineItemService.update).toHaveBeenCalledTimes(2)
+      expect(lineItemService.update).toHaveBeenCalledWith("item_1", {
+        order_id: "id",
+      })
+      expect(lineItemService.update).toHaveBeenCalledWith("item_2", {
+        order_id: "id",
+      })
 
+      expect(orderRepo.create).toHaveBeenCalledTimes(1)
+      expect(orderRepo.create).toHaveBeenCalledWith(order)
+      expect(orderRepo.save).toHaveBeenCalledWith(order)
+    })
+    // ! Have to fix
     // describe("gift card creation", () => {
     //   const taxLineRateOne = 20
     //   const taxLineRateTwo = 10
