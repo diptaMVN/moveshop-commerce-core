@@ -246,94 +246,94 @@ describe("OrderService", () => {
       expect(orderRepo.create).toHaveBeenCalledWith(order)
       expect(orderRepo.save).toHaveBeenCalledWith(order)
     })
-    // ! Have to fix
-    // describe("gift card creation", () => {
-    //   const taxLineRateOne = 20
-    //   const taxLineRateTwo = 10
-    //   const giftCardValue = 100
-    //   const totalGiftCardsPurchased = 2
-    //   const expectedGiftCardTaxRate = taxLineRateOne + taxLineRateTwo
-    //   const lineItemWithGiftCard = {
-    //     id: "item_1",
-    //     variant_id: "variant-1",
-    //     // quantity: 2,
-    //     is_giftcard: true,
-    //     subtotal: giftCardValue * totalGiftCardsPurchased,
-    //     quantity: totalGiftCardsPurchased,
-    //     metadata: {},
-    //     tax_lines: [
-    //       {
-    //         rate: taxLineRateOne,
-    //       },
-    //       {
-    //         rate: taxLineRateTwo,
-    //       },
-    //     ],
-    //   }
 
-    //   const lineItemWithoutGiftCard = {
-    //     ...lineItemWithGiftCard,
-    //     is_giftcard: false,
-    //   }
+    describe("gift card creation", () => {
+      const taxLineRateOne = 20
+      const taxLineRateTwo = 10
+      const giftCardValue = 100
+      const totalGiftCardsPurchased = 2
+      const expectedGiftCardTaxRate = taxLineRateOne + taxLineRateTwo
+      const lineItemWithGiftCard = {
+        id: "item_1",
+        variant_id: "variant-1",
+        // quantity: 2,
+        is_giftcard: true,
+        subtotal: giftCardValue * totalGiftCardsPurchased,
+        quantity: totalGiftCardsPurchased,
+        metadata: {},
+        tax_lines: [
+          {
+            rate: taxLineRateOne,
+          },
+          {
+            rate: taxLineRateTwo,
+          },
+        ],
+      }
 
-    //   const cartWithGiftcard = {
-    //     id: "id",
-    //     email: "test@test.com",
-    //     customer_id: "cus_1234",
-    //     payment: {},
-    //     region_id: "test",
-    //     region: {
-    //       id: "test",
-    //       currency_code: "eur",
-    //       name: "test",
-    //       tax_rate: 25,
-    //     },
-    //     shipping_address_id: "1234",
-    //     billing_address_id: "1234",
-    //     gift_cards: [],
-    //     discounts: [],
-    //     shipping_methods: [{ id: "method_1" }],
-    //     items: [lineItemWithGiftCard],
-    //     total: 100,
-    //     subtotal: 100,
-    //     discount_total: 0,
-    //   }
+      const lineItemWithoutGiftCard = {
+        ...lineItemWithGiftCard,
+        is_giftcard: false,
+      }
 
-    //   const cartWithoutGiftcard = {
-    //     ...cartWithGiftcard,
-    //     items: [lineItemWithoutGiftCard],
-    //   }
+      const cartWithGiftcard = {
+        id: "id",
+        email: "test@test.com",
+        customer_id: "cus_1234",
+        payment: {},
+        region_id: "test",
+        region: {
+          id: "test",
+          currency_code: "eur",
+          name: "test",
+          tax_rate: 25,
+        },
+        shipping_address_id: "1234",
+        billing_address_id: "1234",
+        gift_cards: [],
+        discounts: [],
+        shipping_methods: [{ id: "method_1" }],
+        items: [lineItemWithGiftCard],
+        total: 100,
+        subtotal: 100,
+        discount_total: 0,
+      }
 
-    //   it("creates gift cards when a lineItem contains a gift card variant", async () => {
-    //     orderService.cartService_.retrieveWithTotals = jest.fn(() =>
-    //       Promise.resolve(cartWithGiftcard)
-    //     )
+      const cartWithoutGiftcard = {
+        ...cartWithGiftcard,
+        items: [lineItemWithoutGiftCard],
+      }
 
-    //     await orderService.createFromCart("1", "id")
+      it("creates gift cards when a lineItem contains a gift card variant", async () => {
+        orderService.cartService_.retrieveWithTotals = jest.fn(() =>
+          Promise.resolve(cartWithGiftcard)
+        )
 
-    //     expect(giftCardService.create).toHaveBeenCalledTimes(
-    //       totalGiftCardsPurchased
-    //     )
-    //     expect(giftCardService.create).toHaveBeenCalledWith({
-    //       order_id: "id",
-    //       region_id: "test",
-    //       value: giftCardValue,
-    //       balance: giftCardValue,
-    //       metadata: {},
-    //       tax_rate: expectedGiftCardTaxRate,
-    //     })
-    //   })
+        await orderService.createFromCart("1", "id")
 
-    //   it("does not create gift cards when a lineItem doesn't contains a gift card variant", async () => {
-    //     orderService.cartService_.retrieveWithTotals = jest.fn(() =>
-    //       Promise.resolve(cartWithoutGiftcard)
-    //     )
+        expect(giftCardService.create).toHaveBeenCalledTimes(
+          totalGiftCardsPurchased
+        )
+        expect(giftCardService.create).toHaveBeenCalledWith("1", {
+          order_id: "id",
+          region_id: "test",
+          value: giftCardValue,
+          balance: giftCardValue,
+          metadata: {},
+          tax_rate: expectedGiftCardTaxRate,
+        })
+      })
 
-    //     await orderService.createFromCart("id")
+      it("does not create gift cards when a lineItem doesn't contains a gift card variant", async () => {
+        orderService.cartService_.retrieveWithTotals = jest.fn(() =>
+          Promise.resolve(cartWithoutGiftcard)
+        )
 
-    //     expect(giftCardService.create).not.toHaveBeenCalled()
-    //   })
-    // })
+        await orderService.createFromCart("1", "id")
+
+        expect(giftCardService.create).not.toHaveBeenCalled()
+      })
+    })
 
     it("creates gift card transactions", async () => {
       const cart = {
